@@ -49,7 +49,7 @@ class external extends external_api {
      * Describes the parameters for submit_create_group_form webservice.
      * @return external_function_parameters
      */
-    public static function generate_report_parameters() {
+    public static function generate_time_report_parameters() {
         return new external_function_parameters([
             'jsonformdata' => new external_value(PARAM_RAW, 'The context level data, encoded as a json array')
         ]);
@@ -61,11 +61,11 @@ class external extends external_api {
      * @param string $jsonformdata The data from the form, encoded as a json array.
      * @return int new group id.
      */
-    public static function generate_report($jsonformdata) {
+    public static function generate_time_report($jsonformdata) {
         require_once(dirname(__FILE__) . '/../locallib.php');
         $lib = new \TimeReport();
 
-        $params = self::validate_parameters(self::generate_report_parameters(), [
+        $params = self::validate_parameters(self::generate_time_report_parameters(), [
             'jsonformdata' => $jsonformdata
         ]);
 
@@ -103,7 +103,7 @@ class external extends external_api {
      * @return external_description
      * @since Moodle 3.0
      */
-    public static function generate_report_returns() {
+    public static function generate_time_report_returns() {
         return new external_value(PARAM_BOOL, 'Success');
     }
 

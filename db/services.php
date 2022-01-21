@@ -25,9 +25,9 @@
 defined('MOODLE_INTERNAL') || die;
 
 $functions = [
-    'tool_time_report_generate_report' => [
+    'tool_time_report_generate_time_report' => [
         'classname'   => 'tool_time_report\external',
-        'methodname'  => 'generate_report',
+        'methodname'  => 'generate_time_report',
         'classpath'   => '',
         'description' => 'Generate the time report for a user',
         'ajax' => true,

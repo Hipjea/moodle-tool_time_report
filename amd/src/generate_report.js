@@ -33,9 +33,8 @@ define(['jquery',
             };
             this.formdata = formdata;
 
-            console.log("here", JSON.stringify(formdata));
             Ajax.call([{
-                methodname: 'tool_time_report_generate_report',
+                methodname: 'tool_time_report_generate_time_report',
                 args: { jsonformdata: JSON.stringify(formdata) },
                 done: function() {
                     $('#report-area').addClass('alert-warning')

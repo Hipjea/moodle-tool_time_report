@@ -75,8 +75,6 @@ function tool_time_report_myprofile_navigation(core_user\output\myprofile\tree $
         $url = new moodle_url('/admin/tool/time_report/view.php', ['userid' => $user->id]);
     }
 
-    $urlgradebook = new moodle_url('/admin/tool/time_report/gradebook.php', ['userid' => $user->id]);
-
     $node = new core_user\output\myprofile\node('time_report', 'tool_time_report', get_string('time_report', 'tool_time_report'), null, $url);
     $category->add_node($node);
 
