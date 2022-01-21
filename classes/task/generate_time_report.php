@@ -93,7 +93,7 @@ class generate_time_report extends \core\task\adhoc_task {
 
     private function prepare_results($user, $data, $startmonth, $endmonth) {
         if (!array_values($data)) {
-            return '<h5>Pas de résultats trouvés.</h5>';
+            return '<h5>'. get_string('no_results_found', 'tool_time_report') .'</h5>';
         }
 
         $current_day = array_values($data)[0]->time;
@@ -189,13 +189,15 @@ class generate_time_report extends \core\task\adhoc_task {
 
         $delimiter = \csv_import_reader::get_delimiter('comma');
         $csventries = array(array());
-        $csventries[] = array('Nom', 'Prenom', 'Email');
+        $csventries[] = array(
+            get_string('name', 'core'),
+            get_string('firstname', 'core'),
+            get_string('email', 'core')
+        );
         $csventries[] = array($user->firstname, $user->lastname, $user->email);
-        $csventries[] = array("\n");
-        $csventries[] = array('Période', $startmonthstr . ' - ' . $endmonthstr);
-        $csventries[] = array('Temps total pour la période', $this->format_seconds($this->getTotaltime()));
-        $csventries[] = array("\n");
-        $csventries[] = array('Date', 'Durée cumulée');
+        $csventries[] = array(get_string('period', 'tool_time_report'), $startmonthstr . ' - ' . $endmonthstr);
+        $csventries[] = array(get_string('period_total_time', 'tool_time_report'), $this->format_seconds($this->getTotaltime()));
+        $csventries[] = array('Date', get_string('total_duration', 'tool_time_report'));
 
         $returnstr = '';
         $len = sizeof($data);
@@ -237,8 +239,9 @@ class generate_time_report extends \core\task\adhoc_task {
             $path = "$CFG->wwwroot/pluginfile.php/$contextid/tool_time_report/content/0/$name";
 
             $fullname = fullname($user);
-            $messagehtml = "<p>Le rapport de l'utilisateur <strong>$fullname</strong> a été créé.</p>";
-            $messagehtml .= "<p>Téléchargement : <a href=\"$path\" download><i class=\"fa fa-download\"></i>$name</a></p>";
+            $messagehtml = "<p>" . get_string('messageprovider:user_report_created', 'tool_time_report', $fullname) . "</p>";
+            $messagehtml .= "<p>" . get_string('download', 'core') . " : ";
+            $messagehtml .= "<a href=\"$path\" download><i class=\"fa fa-download\"></i>$name</a></p>";
             $contexturl = new moodle_url('/admin/tool/time_report/view.php', array('userid' => $user->id));
 
             $message = new message();
@@ -250,10 +253,10 @@ class generate_time_report extends \core\task\adhoc_task {
             $message->fullmessageformat = FORMAT_MARKDOWN;
             $message->fullmessage       = html_to_text($messagehtml);
             $message->fullmessagehtml   = $messagehtml;
-            $message->smallmessage      = "Un rapport de d'utilisateur a été créé";
+            $message->smallmessage      = get_string('messageprovider:report_created', 'tool_time_report');
             $message->notification      = 1;
             $message->contexturl        = $contexturl;
-            $message->contexturlname    = 'Rapport de temps de connexion';
+            $message->contexturlname    = get_string('time_report', 'tool_time_report');
             // Set the file attachment
             $message->attachment = $file;
             message_send($message);
