@@ -178,7 +178,7 @@ class generate_time_report extends \core\task\adhoc_task {
     private function create_csv($user, $requestorid, $data, $contextid, $startmonth, $endmonth) {
         global $CFG;
         require_once($CFG->libdir . '/csvlib.class.php');
-        require_once(dirname(__FILE__) . '/locallib.php');
+        require_once(dirname(__FILE__) . '/../../locallib.php');
 
         $lib = new \TimeReport();
         
