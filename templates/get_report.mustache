@@ -1,0 +1,77 @@
+<div id="sonate-report-form-container">
+    <h3>{{#str}} time_report, tool_time_report {{/str}}</h3>
+
+    <form class="mt-4">
+        <div class="form-group row">
+            <label for="startInput" class="col-sm-2 col-form-label">{{#str}} startingdate, tool_time_report {{/str}}</label>
+            <div class="">
+                <input type="text" class="form-control datepicker" id="startInput" aria-describedby="startHelp" placeholder="Date de début..." data-min-view="months" data-view="months" data-date-format="MM yyyy">
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="startInput" class="col-sm-2 col-form-label">{{#str}} endingdate, tool_time_report {{/str}}</label>
+            <div class="">
+                <input type="text" class="form-control datepicker" id="endInput" aria-describedby="endHelp" placeholder="Date de fin..." data-min-view="months" data-view="months" data-date-format="MM yyyy">
+            </div>
+        </div>
+        <div class="row mt-4">
+            <div class="col-12">
+                <button type="submit" id="submitdate" class="btn btn-primary" data-context-tree-node="1">
+                    {{#str}} create {{/str}}
+                </button>
+            </div>
+        </div>
+    </form>
+
+    <div id="report-area" class="mt-5 mb-5 alert"></div>
+
+    <div class="mt-5">
+        <h4>{{#str}} reports_list, tool_time_report {{/str}}</h4>
+        <ul class="list-group list-group-flush mt-3">
+            {{#reportfiles}}
+                <li class="list-group-item">
+                    <a href="{{{url}}}">
+                        <i class="fa fa-download pr-2"></i>
+                        {{{filename}}}
+                    </a>
+                </li>
+            {{/reportfiles}}
+        </ul>
+    </div>
+</div>
+
+{{#js}}
+require(['jquery', 'tool_time_report/jquery-ui'], function($) {
+    $.datepicker.regional['fr'] = {
+        prevText: '<',
+        nextText: '>',
+        monthNames: ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
+                'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'],
+        monthNamesShort: ['Jan', 'Fev', 'Mar', 'Avr', 'Mai', 'Ju.',
+                'Jui', 'Aou', 'Sep', 'Oct', 'Nov', 'Dec'],
+        dayNames: ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'],
+        dayNamesShort: ['Di', 'Lu', 'Ma', 'Me', 'Je', 'Ve', 'Sa'],
+        dayNamesMin: ['Di', 'Lu', 'Ma', 'Me', 'Je', 'Ve', 'Sa'],
+        currentText: 'Aujourd’hui',
+        closeText: 'Fermer',
+        weekHeader: 'Se',
+        dateFormat: 'mmyy',
+        firstDay: 1,
+        changeMonth: true,
+        changeYear: true,
+        isRTL: false,
+        showMonthAfterYear: false,
+        startDate: '01/01/2017'
+    };
+    $.datepicker.setDefaults($.datepicker.regional['fr']);
+
+    $("#startInput, #endInput").datepicker({
+        changeMonth: true,
+        changeYear: true,
+        showButtonPanel: true,
+        onClose: function(dateText, inst) {
+            $(this).datepicker('setDate', new Date(inst.selectedYear, inst.selectedMonth, 1));
+        }
+    });
+});
+{{/js}}

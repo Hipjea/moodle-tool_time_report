@@ -1,0 +1,134 @@
+.ui-datepicker-calendar {
+    .ui-state-disabled {
+        cursor: default !important;
+        pointer-events: none;
+    }
+}
+
+input.ui-button {
+    &.ui-icon-notext {
+        .ui-icon {
+            width: auto;
+            height: auto;
+            text-indent: 0;
+            white-space: normal;
+            padding: .4em 1em;
+        }
+    }
+}
+
+.ui-datepicker {
+    box-shadow: 1px 2px 4px rgba(176,176,176,.5);
+    background-color: #f4f4f4;
+    width: 17em;
+    padding: .2em .2em 0;
+    display: none;
+
+    .ui-datepicker-header {
+        position: relative;
+        padding: .2em 0;
+    }
+
+    .ui-datepicker-prev,
+    .ui-datepicker-next {
+        position: absolute;
+        top: 2px;
+        width: 1.8em;
+        height: 1.8em;
+        text-align: center;
+        font-size: 1.5em;
+
+        &:hover {
+            cursor: pointer;
+        }
+    }
+
+    .ui-datepicker-prev {
+        left: 2px;
+    }
+
+    .ui-datepicker-next {
+        right: 2px;
+    }
+
+    .ui-datepicker-prev-hover {
+        left: 1px;
+    }
+
+    .ui-datepicker-next-hover {
+        right: 1px;
+    }
+
+    .ui-datepicker-title {
+        margin: 0 2.3em;
+        line-height: 1.8em;
+        text-align: center;
+        
+        select {
+            font-size: 1em;
+            margin: 1px 0;
+
+            &.ui-datepicker-month,
+            &.ui-datepicker-year {
+                width: 45%;
+            }
+        }
+    }
+
+    table {
+        width: 100%;
+        font-size: .9em;
+        border-collapse: collapse;
+        margin: 0 0 .4em;
+
+        th {
+            padding: .7em .3em;
+            text-align: center;
+            font-weight: bold;
+            border: 0;
+        }
+
+        td {
+            border: 0;
+            padding: 1px;
+
+            span,
+            a {
+                display: block;
+                padding: .2em;
+                text-align: right;
+                text-decoration: none;
+            }
+        }
+    }
+
+    .ui-datepicker-buttonpane {
+        background-image: none;
+        margin: .7em 0 0 0;
+        padding: 0 .2em;
+        border-left: 0;
+        border-right: 0;
+        border-bottom: 0;
+
+        button {
+            float: right;
+            margin: .5em .2em .4em;
+            cursor: pointer;
+            padding: .2em .6em .3em .6em;
+            width: auto;
+            overflow: visible;
+            border: 0;
+            border-radius: 4px;
+            background-color: #231a31;
+            color: #FFFFFF;
+
+            &.ui-datepicker-current {
+                float: left;
+            }
+        }
+    }
+
+    .ui-icon {
+        display: block;
+    }
+}
