@@ -96,77 +96,74 @@ class generate_time_report extends \core\task\adhoc_task {
             return '<h5>'. get_string('no_results_found', 'tool_time_report') .'</h5>';
         }
 
-        $current_day = array_values($data)[0]->time;
-        $current_timestamp = array_values($data)[0]->timecreated;
-        $day_time = 0;
+        $currentday = array_values($data)[0];
+        $daytime = 0;
         $i = 0;
-        $shift = 6;
-        $l = sizeof($data);
-        $interactions = 0;
+        $length = sizeof($data);
 
         $out = array();
         $totaltime = 0;
 
-        for ($i; $i < $l; $i++) {
+        for ($i; $i < $length; $i++) {
             $item = array_values($data)[$i];
             if (!isset(array_values($data)[$i+1])) {
-                $next_val = $item;
+                $nextval = $item;
             } else {
-                $next_val = array_values($data)[$i+1];
+                $nextval = array_values($data)[$i+1];
             }
 
-            if ($item->time == $current_day) {
-                if ($item->timecreated == $current_timestamp) {
-                    $day_time = 0;
+            if ($item->time == $currentday->time) {
+                if ($item->timecreated == $currentday->timecreated) {
+                    $daytime = 0;
                 } else {
-                    if ( isset($next_val) && $next_val->time == $current_day ) {
-                        $nval = intval($next_val->timecreated);
+                    if ( isset($nextval) && $nextval->time == $currentday->time ) {
+                        $nextvaltimecreated = intval($nextval->timecreated);
                         $inttimecreated = intval($item->timecreated);
-                        $ts = $nval - $inttimecreated;
+                        $ts = $nextvaltimecreated - $inttimecreated;
                         if (intval($ts / 60) > 30) {
-                            $day_time = $day_time + self::BORROWED_TIME;
+                            $daytime = $daytime + self::BORROWED_TIME;
                         } else {
-                            $new_day_time = $day_time + $nval - $inttimecreated;
-                            if ( $day_time == $new_day_time ) {
+                            $new_day_time = $daytime + $nextvaltimecreated - $inttimecreated;
+                            if ( $daytime == $new_day_time ) {
                                 continue;
                             } else {
-                                if ( $new_day_time < intval($day_time + 30) ) {
-                                    $day_time = $day_time + $nval - $inttimecreated;
+                                if ( $new_day_time < intval($daytime + 30) ) {
+                                    $daytime = $daytime + $nextvaltimecreated - $inttimecreated;
                                     continue;
                                 } else {
-                                    $day_time = $day_time + $nval - $inttimecreated;
+                                    $daytime = $daytime + $nextvaltimecreated - $inttimecreated;
                                 }
                             }
                         }
                     }
                 }
                 
-                if ( $day_time > 0 ) {
-                    $end_connection = isset($next_val) ? date('H:i:s', $this->end_connection($item->timecreated, $next_val->timecreated)) : '...';
+                if ( $daytime > 0 ) {
+                    $end_connection = isset($nextval) ? date('H:i:s', $this->end_connection($item->timecreated, $nextval->timecreated)) : '...';
 
                     // Calculate total time.
-                    if ($i+1 < $l) {
-                        if ($next_val) {
-                            if ($current_day != $next_val->time) {
-                                $totaltime = $totaltime + $day_time;
+                    if ($i+1 < $length) {
+                        if ($nextval) {
+                            if ($currentday->time != $nextval->time) {
+                                $totaltime = $totaltime + $daytime;
                             }
                         }
                     } else {
-                        $totaltime = $totaltime + $day_time;
+                        $totaltime = $totaltime + $daytime;
                     }
                 }
                 
             } else {
-                $current_day = $item->time;
-                $day_time = 0;
-                if ( $day_time > 0 ) {
-                    $end_connection = isset($next_val) ? date('H:i:s', $this->end_connection($item->timecreated, $next_val->timecreated)) : '...';
+                $currentday = $item;
+                $daytime = 0;
+                if ( $daytime > 0 ) {
+                    $end_connection = isset($nextval) ? date('H:i:s', $this->end_connection($item->timecreated, $nextval->timecreated)) : '...';
                 }
             }
 
-            if ( ($day_time > 0 && isset($next_val) && $next_val->time != $current_day) || ($day_time > 0 && $next_val == $item) ) {
+            if ( ($daytime > 0 && isset($nextval) && $nextval->time != $currentday->time) || ($daytime > 0 && $nextval == $item) ) {
                 $date = date('d/m/Y', $item->timecreated);
-                $seconds = $this->format_seconds($day_time);
+                $seconds = $this->format_seconds($daytime);
                 array_push($out, array($date, $seconds));
             }
         }
