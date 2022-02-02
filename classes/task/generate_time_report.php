@@ -61,10 +61,12 @@ class generate_time_report extends \core\task\adhoc_task {
         global $DB;
 
         $data = $this->get_custom_data();
-        $user = $DB->get_record('user', array('id' => $data->userid), '*', MUST_EXIST);
-        $results = $this->get_time_spent($user->id, $data->start, $data->end);
-        $csv_data = $this->prepare_results($user, $results, $data->start, $data->end);
-        $this->create_csv($user, $data->requestorid, $csv_data, $data->contextid, $data->start, $data->end);
+        if (isset($data)) {
+            $user = $DB->get_record('user', array('id' => $data->userid), '*', MUST_EXIST);
+            $results = $this->get_time_spent($user->id, $data->start, $data->end);
+            $csv_data = $this->prepare_results($user, $results, $data->start, $data->end);
+            $this->create_csv($user, $data->requestorid, $csv_data, $data->contextid, $data->start, $data->end);
+        }
     }
 
     private static function format_seconds($seconds) {

@@ -22,10 +22,10 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['pluginname'] = 'SONATE reports';
-$string['time_report'] = 'SONATE Reports';
+$string['pluginname'] = 'Time Reports';
+$string['time_report'] = 'Time Reports';
 $string['messageprovider:reportcreation'] = 'Report creation';
-$string['time_report:view'] = 'Get SONATE time reports';
+$string['time_report:view'] = 'Get time reports';
 $string['time_report'] = 'Time report';
 $string['startingdate'] = 'Starting date';
 $string['endingdate'] = 'Ending date';
@@ -34,5 +34,6 @@ $string['no_results_found'] = 'No results found';
 $string['period'] = 'Period';
 $string['period_total_time'] = 'Total duration for the period';
 $string['total_duration'] = 'Total duration';
+$string['daily_time_report'] = 'Daily time report';
 $string['messageprovider:report_created'] = 'A time report has been created';
 $string['messageprovider:user_report_created'] = 'The report for the user <strong>${a}</strong> has been created.';
