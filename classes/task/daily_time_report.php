@@ -49,14 +49,23 @@ class daily_time_report extends \core\task\scheduled_task {
                 $this->setTotaltime(0);
                 $userrow = $this->get_user_timespent($user->id);
                 if (isset($userrow->updatedat) && $userrow->updatedat > 1) {
-                    $results = $this->get_time_spent($user->id, $userrow->updatedat, $endtime);
-                    $parsedresults = $this->prepare_results($user, $results, $userrow->updatedat, $endtime);
-                    $usertimespent = $userrow->timespent;
-                    $newtotal = intval($usertimespent) + intval($this->getTotaltime());
-                    $this->update_user_timespent($userrow, $newtotal);
-
-                    var_dump("User : " . $user->id . " / DB => " . $this->format_seconds($this->get_user_timespent($user->id)->timespent) . " / New time => " . $this->format_seconds($this->getTotaltime()));
-                    print "<br>";
+                    if ($userrow->timespent == 0) {
+                        // case for the first timespent insertion
+                        $results = $this->get_time_spent($user->id, 0, $endtime);
+                        $parsedresults = $this->prepare_results($user, $results, 0, $endtime);
+                        $usertimespent = $userrow->timespent;
+                        $newtotal = intval($usertimespent) + intval($this->getTotaltime());
+                        $this->update_user_timespent($userrow, $newtotal);
+                    } else {
+                        // otherwise, we use the user's updatedat timestamp value as the start time
+                        $results = $this->get_time_spent($user->id, $userrow->updatedat, $endtime);
+                        $parsedresults = $this->prepare_results($user, $results, $userrow->updatedat, $endtime);
+                        $usertimespent = $userrow->timespent;
+                        $newtotal = intval($usertimespent) + intval($this->getTotaltime());
+                        $this->update_user_timespent($userrow, $newtotal);
+                    }
+                    // var_dump("User : " . $user->id . " / DB => " . $this->format_seconds($this->get_user_timespent($user->id)->timespent) . " / New time => " . $this->format_seconds($this->getTotaltime()));
+                    // print "<br>";
                 } else {
                     $starttime = 0;
                     $results = $this->get_time_spent($user->id, $starttime, $endtime);
