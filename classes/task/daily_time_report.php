@@ -13,25 +13,7 @@ class daily_time_report extends \core\task\scheduled_task {
     const BORROWED_TIME = 900;
 
     protected $userid;
-    protected $starttime = 0;
-    protected $endtime = 0;
     protected $totaltime = 0;
-
-    public function getStarttime() { 
-        return $this->starttime; 
-    }
-
-    public function setStarttime($starttime) { 
-        $this->starttime = $starttime; 
-    }
-
-    public function getEndtime() { 
-        return $this->endtime; 
-    }
-
-    public function setEndtime($endtime) { 
-        $this->endtime = $endtime; 
-    }
 
     public function setTotaltime($totaltime) { 
         $this->totaltime = $totaltime; 
@@ -56,35 +38,80 @@ class daily_time_report extends \core\task\scheduled_task {
     public function execute() {
         global $DB;
 
-        $starttime = $this->setStarttime("122020");
-        $endtime = $this->setEndtime(new \Datetime("now"));
+        $now = new \Datetime("now");
+        $yesterday = new \Datetime("now");
+        $yesterday->sub(new \DateInterval('P1D'));
+        $endtime = $now->getTimestamp();
 
         if ($users = $DB->get_records('user')) {
             foreach($users as $user) {
                 // reset the total time
                 $this->setTotaltime(0);
-                $results = $this->get_time_spent($user->id, $this->starttime, $this->endtime);
-                $parsedresults = $this->prepare_results($user, $results, $this->starttime, $this->endtime);
+                $userrow = $this->get_user_timespent($user->id);
+                if (isset($userrow->updatedat) && $userrow->updatedat > 1) {
+                    $results = $this->get_time_spent($user->id, $userrow->updatedat, $endtime);
+                    $parsedresults = $this->prepare_results($user, $results, $userrow->updatedat, $endtime);
+                    $usertimespent = $userrow->timespent;
+                    $newtotal = intval($usertimespent) + intval($this->getTotaltime());
+                    $this->update_user_timespent($userrow, $newtotal);
 
-                var_dump("User : " . $user->id . " => " . $this->getTotaltime());
-                print "<br>";
+                    var_dump("User : " . $user->id . " / DB => " . $this->format_seconds($this->get_user_timespent($user->id)->timespent) . " / New time => " . $this->format_seconds($this->getTotaltime()));
+                    print "<br>";
+                } else {
+                    $starttime = 0;
+                    $results = $this->get_time_spent($user->id, $starttime, $endtime);
+                    $parsedresults = $this->prepare_results($user, $results, $starttime, $endtime);
+                    $totaltime = intval($this->getTotaltime());
+
+                    if ($this->create_user_timespent($user->id, $totaltime)) {
+
+                    }
+                }
             }
         }
     }
 
-    private function get_time_spent($userid, $startmonth) {
+    private function get_user_timespent($userid) {
+        global $DB;
+        // get the user record
+        $sql = 'SELECT *
+                FROM {time_report_user_time}
+                WHERE userid = :userid
+                LIMIT 1';
+        return $DB->get_record_sql($sql, array('userid' => $userid));
+    }
+
+    private function create_user_timespent($userid, $newtimespent) {
+        global $DB;
+        // update the data
+        $now = new \Datetime("now");
+        $row = new \stdClass();
+        $row->userid = $userid;
+        $row->timespent = $newtimespent;
+        $row->updatedat = $now->getTimestamp();
+        $DB->insert_record('time_report_user_time', $row);
+    }
+
+    private function update_user_timespent($row, $newtimespent) {
+        global $DB;
+        // update the data
+        $now = new \Datetime("now");
+        $row->timespent = $newtimespent;
+        $row->updatedat = $now->getTimestamp();
+        $DB->update_record('time_report_user_time', $row);
+    }
+
+    private function get_time_spent($userid, $starttime, $endtime) {
         global $DB;
         
         if (!isset($startmonth)) {
             $startmonth = date('mY');
         }
 
-        $endmonth = date('mY', $this->endtime->getTimestamp());
+        $endmonth = date('mY', $endtime);
         $lastday = date(date('t', strtotime('01')) .'-' . $endmonth[0] . $endmonth[1] . '-' . $endmonth[2] . $endmonth[3] . $endmonth[4] . $endmonth[5]);
-        $startdate = \DateTime::createFromFormat('dmY', '01'.$startmonth);
-        $enddate = \DateTime::createFromFormat('dmY', $lastday[0].$lastday[1].$endmonth);
-        $startdate = $startdate->getTimestamp();
-        $enddate = $enddate->getTimestamp();
+        $newendtime = \DateTime::createFromFormat('dmY', $lastday[0].$lastday[1].$endmonth);
+        $newendtime = $newendtime->getTimestamp();
 
         $sql = 'SELECT {logstore_standard_log}.id, {logstore_standard_log}.timecreated, 
                 {logstore_standard_log}.courseid, 
@@ -99,7 +126,7 @@ class daily_time_report extends \core\task\scheduled_task {
                 AND {logstore_standard_log}.courseid <> 1 
                 ORDER BY {logstore_standard_log}.timecreated ASC';
             
-        $results = $DB->get_records_sql($sql, array($userid, $startdate, $enddate));
+        $results = $DB->get_records_sql($sql, array($userid, $starttime, $newendtime));
         return $results;
     }
 
@@ -180,8 +207,20 @@ class daily_time_report extends \core\task\scheduled_task {
 
         return $this->setTotaltime($totaltime);
     }
+
+    private static function format_seconds($seconds) {
+        $hours = 0;
+        $milliseconds = str_replace('0.', '', $seconds - floor( $seconds ));
+        if ($seconds > 3600) {
+            $hours = floor($seconds / 3600);
+        }
+        $seconds = $seconds % 3600;
+        return str_pad($hours, 2, '0', STR_PAD_LEFT)
+            . date(':i:s', $seconds)
+            . ($milliseconds ? $milliseconds : '');
+    }
 }
 
 // TEST CALL
-$test = new daily_time_report();
-$test->execute();
+// $test = new daily_time_report();
+// $test->execute();
