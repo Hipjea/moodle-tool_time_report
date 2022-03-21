@@ -58,16 +58,10 @@ $PAGE->set_other_editing_capability('moodle/course:manageactivities');
 echo $OUTPUT->header();
 
 $admins = get_admins();
-$is_admin = false;
-
-foreach ($admins as $admin) {
-    if ($user->id == $admin->id) {
-        $is_admin = true;
-    }
-}
+$is_admin = in_array($user->id, array_keys($admins));
 
 if ($is_admin) {
-    //redirect("$CFG->wwwroot/user/profile.php?id=?$user->id");
+    redirect("$CFG->wwwroot/user/profile.php?id=?$user->id");
 }
 
 $context = \context_system::instance();
