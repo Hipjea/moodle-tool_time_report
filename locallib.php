@@ -71,8 +71,11 @@ class TimeReport {
         fclose($f);
     }
 
-    public function generate_file_name($userid, $startdate, $enddate) {
-        return 'report_user_' .$userid. '__' .$startdate. '_' .$enddate. '.csv';
+    public function generate_file_name($startdate, $enddate) {
+        if (!$this->userid) {
+            throw new \coding_exception('Missing userid');
+        }
+        return 'report_user_' .$this->userid. '__' .$startdate. '_' .$enddate. '.csv';
     }
 
     public function get_user_id_from_filename($filename) {

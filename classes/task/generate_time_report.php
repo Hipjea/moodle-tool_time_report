@@ -208,7 +208,7 @@ class generate_time_report extends \core\task\adhoc_task {
         }
         
         $timereport = new \TimeReport($contextid, $user->id);
-        $filename = $timereport->generate_file_name($user->id, $startmonth, $endmonth);
+        $filename = $timereport->generate_file_name($startmonth, $endmonth);
 
         return $this->write_new_file($returnstr, $contextid, $filename, $user, $requestorid);
     }
