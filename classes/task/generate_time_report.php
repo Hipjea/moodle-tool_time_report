@@ -213,7 +213,7 @@ class generate_time_report extends \core\task\adhoc_task {
         return $this->write_new_file($returnstr, $contextid, $filename, $user, $requestorid);
     }
 
-    private function write_new_file($content, $contextid, $name, $user, $requestorid) {
+    private function write_new_file($content, $contextid, $filename, $user, $requestorid) {
         global $CFG;
 
         $fs = get_file_storage();
@@ -223,7 +223,7 @@ class generate_time_report extends \core\task\adhoc_task {
             'filearea' => 'content',    // usually = table name
             'itemid' => 0,               // usually = ID of row in table
             'filepath' => '/',           // any path beginning and ending in /
-            'filename' => $name); // any filename
+            'filename' => $filename); // any filename
 
         $file = $fs->get_file($fileinfo['contextid'], $fileinfo['component'], $fileinfo['filearea'],
                 $fileinfo['itemid'], $fileinfo['filepath'], $fileinfo['filename']);
@@ -234,32 +234,34 @@ class generate_time_report extends \core\task\adhoc_task {
         }
 
         if ($fs->create_file_from_string($fileinfo, $content)) {
-            $path = "$CFG->wwwroot/pluginfile.php/$contextid/tool_time_report/content/0/$name";
-
-            $fullname = fullname($user);
-            $messagehtml = "<p>" . get_string('messageprovider:user_report_created', 'tool_time_report', $fullname) . "</p>";
-            $messagehtml .= "<p>" . get_string('download', 'core') . " : ";
-            $messagehtml .= "<a href=\"$path\" download><i class=\"fa fa-download\"></i>$name</a></p>";
-            $contexturl = new moodle_url('/admin/tool/time_report/view.php', array('userid' => $user->id));
-
-            $message = new message();
-            $message->component         = 'tool_time_report';
-            $message->name              = 'reportcreation';
-            $message->userfrom          = \core_user::get_noreply_user();
-            $message->userto            = $requestorid;
-            $message->subject           = get_string('messageprovider:reportcreation', 'tool_time_report');
-            $message->fullmessageformat = FORMAT_MARKDOWN;
-            $message->fullmessage       = html_to_text($messagehtml);
-            $message->fullmessagehtml   = $messagehtml;
-            $message->smallmessage      = get_string('messageprovider:report_created', 'tool_time_report');
-            $message->notification      = 1;
-            $message->contexturl        = $contexturl;
-            $message->contexturlname    = get_string('time_report', 'tool_time_report');
-            // Set the file attachment
-            $message->attachment = $file;
-            message_send($message);
+            $path = "$CFG->wwwroot/pluginfile.php/$contextid/tool_time_report/content/0/$filename";
+            $this->generate_message($user, $path, $filename);
         }
 
         return $file;
+    }
+
+    public function generate_message($user, $path, $filename) {
+        $fullname = fullname($user);
+        $messagehtml = "<p>" . get_string('messageprovider:user_report_created', 'tool_time_report', $fullname) . "</p>";
+        $messagehtml .= "<p>" . get_string('download', 'core') . " : ";
+        $messagehtml .= "<a href=\"$path\" download><i class=\"fa fa-download\"></i>$filename</a></p>";
+        $contexturl = new moodle_url('/admin/tool/time_report/view.php', array('userid' => $user->id));
+
+        $message = new message();
+        $message->component         = 'tool_time_report';
+        $message->name              = 'reportcreation';
+        $message->userfrom          = \core_user::get_noreply_user();
+        $message->userto            = $requestorid;
+        $message->subject           = get_string('messageprovider:reportcreation', 'tool_time_report');
+        $message->fullmessageformat = FORMAT_MARKDOWN;
+        $message->fullmessage       = html_to_text($messagehtml);
+        $message->fullmessagehtml   = $messagehtml;
+        $message->smallmessage      = get_string('messageprovider:report_created', 'tool_time_report');
+        $message->notification      = 1;
+        $message->contexturl        = $contexturl;
+        $message->contexturlname    = get_string('time_report', 'tool_time_report');
+        $message->attachment = $file; // Set the file attachment
+        message_send($message);
     }
 }
