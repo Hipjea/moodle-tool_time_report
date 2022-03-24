@@ -178,8 +178,6 @@ class generate_time_report extends \core\task\adhoc_task {
         global $CFG;
         require_once($CFG->libdir . '/csvlib.class.php');
         require_once(dirname(__FILE__) . '/../../locallib.php');
-
-        $lib = new \TimeReport();
         
         $datestart = \DateTime::createFromFormat('mY', $startmonth);
         $startmonthstr = $datestart->format('m/Y');
@@ -209,7 +207,8 @@ class generate_time_report extends \core\task\adhoc_task {
             $returnstr .= '"' . implode('"' . $delimiter . '"', $entry) . '"' . "\n";
         }
         
-        $filename = $lib->generate_file_name($user->id, $startmonth, $endmonth);
+        $timereport = new \TimeReport($contextid, $user->id);
+        $filename = $timereport->generate_file_name($user->id, $startmonth, $endmonth);
 
         return $this->write_new_file($returnstr, $contextid, $filename, $user, $requestorid);
     }

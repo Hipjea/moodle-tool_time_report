@@ -30,9 +30,6 @@ require_login();
 global $PAGE, $USER;
 
 $id = optional_param('userid', 0, PARAM_INT);
-
-$lib = new \TimeReport();
-
 $user = $DB->get_record('user', array('id' => $id), '*', MUST_EXIST);
 $currentuser = ($user->id == $USER->id);
 
@@ -61,11 +58,12 @@ $admins = get_admins();
 $is_admin = in_array($user->id, array_keys($admins));
 
 if ($is_admin) {
-    redirect("$CFG->wwwroot/user/profile.php?id=?$user->id");
+    //redirect("$CFG->wwwroot/user/profile.php?id=?$user->id");
 }
 
 $context = \context_system::instance();
-$reportfiles = $lib->get_reports_urls($context->id, $user->id);
+$timereport = new \TimeReport($context->id, $user->id);
+$reportfiles = $timereport->get_reports_urls();
 $renderable = new \tool_time_report\output\get_report($USER->id, $user->id, $context->id, $reportfiles);
 $output = $PAGE->get_renderer('tool_time_report');
 

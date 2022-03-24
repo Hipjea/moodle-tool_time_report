@@ -15,15 +15,24 @@ define("BORROWED_TIME", 900);
 
 class TimeReport {
 
-    public function get_reports_urls($contextid, $userid) {
+    protected $contextid;
+
+    protected $userid;
+
+    public function __construct($contextid, $userid) {
+        $this->contextid = $contextid;
+        $this->userid = $userid;
+    }
+
+    public function get_reports_urls() {
         $fs = get_file_storage();
-        $files = $fs->get_area_files($contextid, 'tool_time_report', 'content');
+        $files = $fs->get_area_files($this->contextid, 'tool_time_report', 'content');
         $out = array();
 
         foreach ($files as $file) {
             $filename = $file->get_filename();
             $file_userid = $this->get_user_id_from_filename($filename);
-            if ($file_userid == $userid && $filename != '.') {
+            if ($file_userid == $this->userid && $filename != '.') {
                 $path = '/'.$file->get_contextid().'/tool_time_report/content/'.$file->get_itemid().$file->get_filepath().$filename;
                 $url = moodle_url::make_file_url('/pluginfile.php', $path);
                 array_push($out, array('url' => $url, 'filename' => $filename));
