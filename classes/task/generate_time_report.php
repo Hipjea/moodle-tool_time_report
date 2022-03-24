@@ -2,7 +2,7 @@
 
 namespace tool_time_report\task;
 
-require_once(__DIR__ . '/../../../../../config.php');
+require_once __DIR__ . '/../../../../../config.php';
 
 use core\message\message;
 use moodle_url;
@@ -176,8 +176,8 @@ class generate_time_report extends \core\task\adhoc_task {
 
     private function create_csv($user, $requestorid, $data, $contextid, $startmonth, $endmonth) {
         global $CFG;
-        require_once($CFG->libdir . '/csvlib.class.php');
-        require_once(dirname(__FILE__) . '/../../locallib.php');
+        require_once $CFG->libdir . '/csvlib.class.php';
+        require_once dirname(__FILE__) . '/../../locallib.php';
         
         $datestart = \DateTime::createFromFormat('mY', $startmonth);
         $startmonthstr = $datestart->format('m/Y');
