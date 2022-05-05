@@ -81,18 +81,6 @@ class generate_time_report extends \core\task\adhoc_task {
             . ($milliseconds ? $milliseconds : '');
     }
 
-    private static function end_connection($current_item_time, $next_item_time) {
-        if ($next_item_time == NULL) {
-            return '';
-        }
-        $val = $next_item_time - $current_item_time / 60;
-        if ($val > 30) {
-            return $current_item_time + self::BORROWED_TIME;
-        } else {
-            return $next_item_time;
-        }
-    }
-
     private function prepare_results($user, $data, $startmonth, $endmonth) {
         if (!array_values($data)) {
             return '<h5>'. get_string('no_results_found', 'tool_time_report') .'</h5>';
@@ -110,33 +98,34 @@ class generate_time_report extends \core\task\adhoc_task {
             $item = array_values($data)[$i];
             $nextval = self::get_nextval($data, $i);
 
+            // Last iteration
+            if ($item->id == $nextval->id) {
+                $out = self::push_result($out, $item->timecreated, $timefortheday);
+                break;
+            }
+
             // If the item log time is equal to the current day time.
             if ($item->logtimecreated == $currentday->logtimecreated) {
-                if ($item->timecreated == $currentday->timecreated) {
-                    $timefortheday = 0;
-                } else {
-                    if (isset($nextval) && $nextval->logtimecreated == $currentday->logtimecreated) {
-                        $nextvaltimecreated = intval($nextval->timecreated);
-                        $itemtimecreated = intval($item->timecreated);
-                        $timedelta = $nextvaltimecreated - $itemtimecreated;
-                        if (intval($timedelta / 60) > 30) {
-                            $timefortheday = $timefortheday + self::BORROWED_TIME;
+                if (isset($nextval) && $nextval->logtimecreated == $currentday->logtimecreated) {
+                    $nextvaltimecreated = intval($nextval->timecreated);
+                    $itemtimecreated = intval($item->timecreated);
+                    $timedelta = $nextvaltimecreated - $itemtimecreated;
+                    if (intval($timedelta / 60) > 30) {
+                        $timefortheday = $timefortheday + self::BORROWED_TIME;
+                    } else {
+                        $newdaytime = $timefortheday + $nextvaltimecreated - $itemtimecreated;
+                        if ($timefortheday == $newdaytime) {
+                            continue;
                         } else {
-                            $newdaytime = $timefortheday + $nextvaltimecreated - $itemtimecreated;
-                            if ($timefortheday == $newdaytime) {
+                            $timefortheday = $timefortheday + $nextvaltimecreated - $itemtimecreated;
+                            if ($newdaytime < intval($timefortheday + 30)) {
                                 continue;
-                            } else {
-                                $timefortheday = $timefortheday + $nextvaltimecreated - $itemtimecreated;
-                                if ($newdaytime < intval($timefortheday + 30)) {
-                                    continue;
-                                }
                             }
                         }
                     }
                 }
                 
                 if ($timefortheday > 0) {
-                    //$end_conn = isset($nextval) ? date('H:i:s', $this->end_connection($item->timecreated, $nextval->timecreated)) : '...';
                     // Calculate total time.
                     if ($i+1 < $length && $nextval) {
                         if ($currentday->logtimecreated != $nextval->logtimecreated) {
@@ -144,19 +133,14 @@ class generate_time_report extends \core\task\adhoc_task {
                         }
                     }
                 }
-                
-            } else { // If the item log time is different of the current day time.
+            } else { 
+                // If the item log time is different of the current day time.
                 $currentday = $item;
                 $timefortheday = 0;
-                //if ($timefortheday > 0) {
-                    //$end_conn = isset($nextval) ? date('H:i:s', $this->end_connection($item->timecreated, $nextval->timecreated)) : '...';
-                //}
             }
 
             if ( ($timefortheday > 0 && isset($nextval) && $nextval->logtimecreated != $currentday->logtimecreated) || ($timefortheday > 0 && $nextval == $item) ) {
-                $date = date('d/m/Y', $item->timecreated);
-                $seconds = $this->format_seconds($timefortheday);
-                array_push($out, array($date, $seconds));
+                $out = self::push_result($out, $item->timecreated, $timefortheday);
             }
         }
 
@@ -164,19 +148,22 @@ class generate_time_report extends \core\task\adhoc_task {
         return $out;
     }
 
+    /**
+     * Get the next item of the array of report results.
+     */
     private static function get_nextval($data, $iteration) {
         $item = array_values($data)[$iteration];
         if (!isset(array_values($data)[$iteration+1])) {
-            $nextval = $item;
-        } else {
-            $nextval = array_values($data)[$iteration+1];
+            return $item;
         }
-        return $nextval;
+        return array_values($data)[$iteration+1];
     }
 
-    private function calculate_timefortheday($item, $currentday) {
-        $timefortheday = 0;
-
+    private static function push_result($items, $itemtimecreated, $timefortheday) {
+        $date = date('d/m/Y', $itemtimecreated);
+        $seconds = self::format_seconds($timefortheday);
+        array_push($items, array($date, $seconds));
+        return $items;
     }
 
     private function create_csv($user, $requestorid, $data, $contextid, $startmonth, $endmonth) {
@@ -195,12 +182,12 @@ class generate_time_report extends \core\task\adhoc_task {
         $csventries[] = array(get_string('firstname', 'core'), $user->firstname);
         $csventries[] = array(get_string('email', 'core'), $user->email);
         $csventries[] = array(get_string('period', 'tool_time_report'), $startmonthstr . ' - ' . $endmonthstr);
-        $csventries[] = array(get_string('period_total_time', 'tool_time_report'), $this->format_seconds($this->getTotaltime()));
+        $csventries[] = array(get_string('period_total_time', 'tool_time_report'), self::format_seconds($this->getTotaltime()));
         $csventries[] = array('Date', get_string('total_duration', 'tool_time_report'));
 
         $returnstr = '';
         $len = sizeof($data);
-        $shift = 6;
+        $shift = count($csventries);
 
         for ($i = 0; $i < $len; $i++) {
             $csventries[$i+$shift] = $data[$i];
@@ -232,8 +219,7 @@ class generate_time_report extends \core\task\adhoc_task {
                 $fileinfo['itemid'], $fileinfo['filepath'], $fileinfo['filename']);
             
         if ($file) {
-            // Delete the old file first
-            $file->delete();
+            $file->delete(); // Delete the old file first.
         }
 
         if ($fs->create_file_from_string($fileinfo, $content)) {
