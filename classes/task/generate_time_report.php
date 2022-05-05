@@ -187,7 +187,7 @@ class generate_time_report extends \core\task\adhoc_task {
 
         $returnstr = '';
         $len = sizeof($data);
-        $shift = 6;
+        $shift = count($csventries);
 
         for ($i = 0; $i < $len; $i++) {
             $csventries[$i+$shift] = $data[$i];
