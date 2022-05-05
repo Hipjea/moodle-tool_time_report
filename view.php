@@ -62,8 +62,7 @@ if ($is_admin) {
 }
 
 $context = \context_system::instance();
-$timereport = new \TimeReport($context->id, $user->id);
-$reportfiles = $timereport->get_reports_urls();
+$reportfiles = get_reports_urls($context->id, $user->id);
 $renderable = new \tool_time_report\output\get_report($USER->id, $user->id, $context->id, $reportfiles);
 $output = $PAGE->get_renderer('tool_time_report');
 

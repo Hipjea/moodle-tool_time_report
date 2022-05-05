@@ -45,19 +45,20 @@ class daily_time_report extends \core\task\scheduled_task {
 
         if ($users = $DB->get_records('user')) {
             foreach($users as $user) {
-                // reset the total time
+                // Reset the total time
                 $this->setTotaltime(0);
                 $userrow = $this->get_user_timespent($user->id);
+                // The user already has a row
                 if (isset($userrow->updatedat) && $userrow->updatedat > 1) {
                     if ($userrow->timespent == 0) {
-                        // case for the first timespent insertion
+                        // Case for the first timespent insertion
                         $results = $this->get_time_spent($user->id, 0, $endtime);
                         $parsedresults = $this->prepare_results($user, $results, 0, $endtime);
                         $usertimespent = $userrow->timespent;
                         $newtotal = intval($usertimespent) + intval($this->getTotaltime());
                         $this->update_user_timespent($userrow, $newtotal);
                     } else {
-                        // otherwise, we use the user's updatedat timestamp value as the start time
+                        // Otherwise, we use the user's updatedat timestamp value as the start time
                         $results = $this->get_time_spent($user->id, $userrow->updatedat, $endtime);
                         $parsedresults = $this->prepare_results($user, $results, $userrow->updatedat, $endtime);
                         $usertimespent = $userrow->timespent;
@@ -67,13 +68,13 @@ class daily_time_report extends \core\task\scheduled_task {
                     // var_dump("User : " . $user->id . " / DB => " . $this->format_seconds($this->get_user_timespent($user->id)->timespent) . " / New time => " . $this->format_seconds($this->getTotaltime()));
                     // print "<br>";
                 } else {
+                    // Create a new user row
                     $starttime = 0;
                     $results = $this->get_time_spent($user->id, $starttime, $endtime);
                     $parsedresults = $this->prepare_results($user, $results, $starttime, $endtime);
                     $totaltime = intval($this->getTotaltime());
-
-                    if ($this->create_user_timespent($user->id, $totaltime)) {
-
+                    if ($totaltime > 0) {
+                        $this->create_user_timespent($user->id, $totaltime);
                     }
                 }
             }
@@ -82,7 +83,7 @@ class daily_time_report extends \core\task\scheduled_task {
 
     private function get_user_timespent($userid) {
         global $DB;
-        // get the user record
+        // Get the user record
         $sql = 'SELECT *
                 FROM {time_report_user_time}
                 WHERE userid = :userid
@@ -92,7 +93,7 @@ class daily_time_report extends \core\task\scheduled_task {
 
     private function create_user_timespent($userid, $newtimespent) {
         global $DB;
-        // update the data
+        // Update the data
         $now = new \Datetime("now");
         $row = new \stdClass();
         $row->userid = $userid;
@@ -103,7 +104,7 @@ class daily_time_report extends \core\task\scheduled_task {
 
     private function update_user_timespent($row, $newtimespent) {
         global $DB;
-        // update the data
+        // Update the data
         $now = new \Datetime("now");
         $row->timespent = $newtimespent;
         $row->updatedat = $now->getTimestamp();
@@ -201,11 +202,9 @@ class daily_time_report extends \core\task\scheduled_task {
                     $end_connection = isset($nextval) ? date('H:i:s', $this->end_connection($item->timecreated, $nextval->timecreated)) : '...';
 
                     // Calculate total time.
-                    if ($i+1 < $length) {
-                        if ($nextval) {
-                            if ($currentday->time != $nextval->time) {
-                                $totaltime = $totaltime + $daytime;
-                            }
+                    if ($i+1 < $length && $nextval) {
+                        if ($currentday->time != $nextval->time) {
+                            $totaltime = $totaltime + $daytime;
                         }
                     } else {
                         $totaltime = $totaltime + $daytime;

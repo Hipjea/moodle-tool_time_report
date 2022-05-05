@@ -74,14 +74,13 @@ class external extends external_api {
             throw new \coding_exception('Missing contextid or userid parameters');
         }
 
-        $timereport = new \TimeReport($serialiseddata['contextid'], $serialiseddata['userid']);
         $fs = get_file_storage();
         $file = $fs->get_file($serialiseddata['contextid'], 
             'tool_time_report', 
             'content', 
             '0', 
             '/', 
-            $timereport->generate_file_name($serialiseddata['start'], $serialiseddata['end'])
+            generate_file_name($serialiseddata['userid'], $serialiseddata['start'], $serialiseddata['end'])
         );
         if ($file) {
             // Delete the old file first
@@ -148,12 +147,11 @@ class external extends external_api {
 
         $contextid = $serialiseddata['contextid'];
         $userid = $serialiseddata['userid'];
-        $timereport = new \TimeReport($contextid, $userid);
 
         $user = $DB->get_record('user', array('id' => $userid), '*', MUST_EXIST);
         if ($user) {
             $fs = get_file_storage();
-            $filename = $timereport->generate_file_name($serialiseddata['start'], $serialiseddata['end']);
+            $filename = generate_file_name($userid, $serialiseddata['start'], $serialiseddata['end']);
             $file = $fs->get_file($contextid, 'tool_time_report', 'content', '0', '/', $filename);
 
             if ($file) {
