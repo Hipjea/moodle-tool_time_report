@@ -65,6 +65,6 @@ $context = \context_system::instance();
 $reportfiles = get_reports_urls($context->id, $user->id);
 $renderable = new \tool_time_report\output\get_report($USER->id, $user->id, $context->id, $reportfiles);
 $output = $PAGE->get_renderer('tool_time_report');
-get_reports_files($context->id, $user->id);
+
 echo $output->render($renderable);
 echo $OUTPUT->footer();

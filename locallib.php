@@ -21,9 +21,6 @@ function get_reports_files($contextid, $userid) {
 
     $conditions = array('contextid' => $contextid, 'component' => 'tool_time_report', 'filearea' => 'content', 'userid' => $userid);
     $file_records = $DB->get_records('files', $conditions);
-    if (!$file_records) {
-        throw new \moodle_exception('No files found.');
-    }
     return $file_records;
 }
 
@@ -73,4 +70,23 @@ function get_user_id_from_filename($filename) {
         return intval($parts[2]);
     }
     return false;
+}
+
+/**
+ * Removes the report files for a given user.
+ *
+ * @param  string $filename
+ * @return int
+ */
+function remove_reports_files($contextid, $userid) {
+    $files = get_reports_files($contextid, $userid);
+
+    foreach($files as $file) {
+        $fs = get_file_storage();
+        $file = $fs->get_file($file->contextid, $file->component, $file->filearea,
+            $file->itemid, $file->filepath, $file->filename);
+        if ($file) {
+            $file->delete();
+        }
+    }
 }
