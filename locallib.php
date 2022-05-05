@@ -16,22 +16,15 @@ defined('MOODLE_INTERNAL') || die();
  *
  * @return Array of moodle_url
  */
-function get_reports_urls($contextid, $userid) {
-    $fs = get_file_storage();
-    $files = $fs->get_area_files($contextid, 'tool_time_report', 'content');
-    $out = array();
+function get_reports_files($contextid, $userid) {
+    global $DB;
 
-    foreach ($files as $file) {
-        $filename = $file->get_filename();
-        $file_userid = get_user_id_from_filename($filename);
-        if ($file_userid == $userid && $filename != '.') {
-            $path = '/' . $file->get_contextid() . '/tool_time_report/content/' . $file->get_itemid() . $file->get_filepath() . $filename;
-            $url = moodle_url::make_file_url('/pluginfile.php', $path);
-            array_push($out, array('url' => $url, 'filename' => $filename));
-        }
+    $conditions = array('contextid' => $contextid, 'component' => 'tool_time_report', 'filearea' => 'content', 'userid' => $userid);
+    $file_records = $DB->get_records('files', $conditions);
+    if (!$file_records) {
+        throw new \moodle_exception('No files found.');
     }
-
-    return $files
+    return $file_records;
 }
 
 /**
@@ -40,17 +33,14 @@ function get_reports_urls($contextid, $userid) {
  * @return Array of moodle_url
  */
 function get_reports_urls($contextid, $userid) {
-    $fs = get_file_storage();
-    $files = $fs->get_area_files($contextid, 'tool_time_report', 'content');
+    $files = get_reports_files($contextid, $userid);
     $out = array();
 
     foreach ($files as $file) {
-        $filename = $file->get_filename();
-        $file_userid = get_user_id_from_filename($filename);
-        if ($file_userid == $userid && $filename != '.') {
-            $path = '/' . $file->get_contextid() . '/tool_time_report/content/' . $file->get_itemid() . $file->get_filepath() . $filename;
+        if ($file->filename != '.') {
+            $path = '/' . $file->contextid . '/tool_time_report/content/' . $file->itemid . $file->filepath . $file->filename;
             $url = moodle_url::make_file_url('/pluginfile.php', $path);
-            array_push($out, array('url' => $url, 'filename' => $filename));
+            array_push($out, array('url' => $url, 'filename' => $file->filename));
         }
     }
 
@@ -83,27 +73,4 @@ function get_user_id_from_filename($filename) {
         return intval($parts[2]);
     }
     return false;
-}
-
-/**
- * Removes the report files for a given user.
- *
- * @return Array of moodle_url
- */
-function get_reports_urls($contextid, $userid) {
-    $fs = get_file_storage();
-    $files = $fs->get_area_files($contextid, 'tool_time_report', 'content');
-    $out = array();
-
-    foreach ($files as $file) {
-        $filename = $file->get_filename();
-        $file_userid = get_user_id_from_filename($filename);
-        if ($file_userid == $userid && $filename != '.') {
-            $path = '/' . $file->get_contextid() . '/tool_time_report/content/' . $file->get_itemid() . $file->get_filepath() . $filename;
-            $url = moodle_url::make_file_url('/pluginfile.php', $path);
-            array_push($out, array('url' => $url, 'filename' => $filename));
-        }
-    }
-
-    return $out;
 }

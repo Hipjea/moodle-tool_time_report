@@ -224,7 +224,9 @@ class generate_time_report extends \core\task\adhoc_task {
             'filearea' => 'content',
             'itemid' => 0,
             'filepath' => '/',
-            'filename' => $filename);
+            'filename' => $filename,
+            'userid' => $user->id
+        );
 
         $file = $fs->get_file($fileinfo['contextid'], $fileinfo['component'], $fileinfo['filearea'],
                 $fileinfo['itemid'], $fileinfo['filepath'], $fileinfo['filename']);
