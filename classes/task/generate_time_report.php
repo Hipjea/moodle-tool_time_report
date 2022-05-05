@@ -2,7 +2,7 @@
 
 namespace tool_time_report\task;
 
-require_once(__DIR__ . '/../../../../../config.php');
+require_once __DIR__ . '/../../../../../config.php';
 
 use core\message\message;
 use moodle_url;
@@ -40,7 +40,7 @@ class generate_time_report extends \core\task\adhoc_task {
         $sql = 'SELECT {logstore_standard_log}.id, {logstore_standard_log}.timecreated, 
                 {logstore_standard_log}.courseid, 
                 DATE_FORMAT(FROM_UNIXTIME({logstore_standard_log}.timecreated), "%Y%m") AS datecreated, 
-                DATE(FROM_UNIXTIME({logstore_standard_log}.timecreated)) AS time, 
+                DATE(FROM_UNIXTIME({logstore_standard_log}.timecreated)) AS logtimecreated, 
                 {logstore_standard_log}.userid, {user}.email, {course}.fullname 
                 FROM {logstore_standard_log} 
                 INNER JOIN {course} ON {logstore_standard_log}.courseid = {course}.id 
@@ -99,7 +99,7 @@ class generate_time_report extends \core\task\adhoc_task {
         }
 
         $currentday = array_values($data)[0];
-        $daytime = 0;
+        $timefortheday = 0;
         $i = 0;
         $length = sizeof($data);
 
@@ -108,64 +108,54 @@ class generate_time_report extends \core\task\adhoc_task {
 
         for ($i; $i < $length; $i++) {
             $item = array_values($data)[$i];
-            if (!isset(array_values($data)[$i+1])) {
-                $nextval = $item;
-            } else {
-                $nextval = array_values($data)[$i+1];
-            }
+            $nextval = self::get_nextval($data, $i);
 
-            if ($item->time == $currentday->time) {
+            // If the item log time is equal to the current day time.
+            if ($item->logtimecreated == $currentday->logtimecreated) {
                 if ($item->timecreated == $currentday->timecreated) {
-                    $daytime = 0;
+                    $timefortheday = 0;
                 } else {
-                    if ( isset($nextval) && $nextval->time == $currentday->time ) {
+                    if (isset($nextval) && $nextval->logtimecreated == $currentday->logtimecreated) {
                         $nextvaltimecreated = intval($nextval->timecreated);
-                        $inttimecreated = intval($item->timecreated);
-                        $ts = $nextvaltimecreated - $inttimecreated;
-                        if (intval($ts / 60) > 30) {
-                            $daytime = $daytime + self::BORROWED_TIME;
+                        $itemtimecreated = intval($item->timecreated);
+                        $timedelta = $nextvaltimecreated - $itemtimecreated;
+                        if (intval($timedelta / 60) > 30) {
+                            $timefortheday = $timefortheday + self::BORROWED_TIME;
                         } else {
-                            $new_day_time = $daytime + $nextvaltimecreated - $inttimecreated;
-                            if ( $daytime == $new_day_time ) {
+                            $newdaytime = $timefortheday + $nextvaltimecreated - $itemtimecreated;
+                            if ($timefortheday == $newdaytime) {
                                 continue;
                             } else {
-                                if ( $new_day_time < intval($daytime + 30) ) {
-                                    $daytime = $daytime + $nextvaltimecreated - $inttimecreated;
+                                $timefortheday = $timefortheday + $nextvaltimecreated - $itemtimecreated;
+                                if ($newdaytime < intval($timefortheday + 30)) {
                                     continue;
-                                } else {
-                                    $daytime = $daytime + $nextvaltimecreated - $inttimecreated;
                                 }
                             }
                         }
                     }
                 }
                 
-                if ( $daytime > 0 ) {
-                    $end_connection = isset($nextval) ? date('H:i:s', $this->end_connection($item->timecreated, $nextval->timecreated)) : '...';
-
+                if ($timefortheday > 0) {
+                    //$end_conn = isset($nextval) ? date('H:i:s', $this->end_connection($item->timecreated, $nextval->timecreated)) : '...';
                     // Calculate total time.
-                    if ($i+1 < $length) {
-                        if ($nextval) {
-                            if ($currentday->time != $nextval->time) {
-                                $totaltime = $totaltime + $daytime;
-                            }
+                    if ($i+1 < $length && $nextval) {
+                        if ($currentday->logtimecreated != $nextval->logtimecreated) {
+                            $totaltime = $totaltime + $timefortheday;
                         }
-                    } else {
-                        $totaltime = $totaltime + $daytime;
                     }
                 }
                 
-            } else {
+            } else { // If the item log time is different of the current day time.
                 $currentday = $item;
-                $daytime = 0;
-                if ( $daytime > 0 ) {
-                    $end_connection = isset($nextval) ? date('H:i:s', $this->end_connection($item->timecreated, $nextval->timecreated)) : '...';
-                }
+                $timefortheday = 0;
+                //if ($timefortheday > 0) {
+                    //$end_conn = isset($nextval) ? date('H:i:s', $this->end_connection($item->timecreated, $nextval->timecreated)) : '...';
+                //}
             }
 
-            if ( ($daytime > 0 && isset($nextval) && $nextval->time != $currentday->time) || ($daytime > 0 && $nextval == $item) ) {
+            if ( ($timefortheday > 0 && isset($nextval) && $nextval->logtimecreated != $currentday->logtimecreated) || ($timefortheday > 0 && $nextval == $item) ) {
                 $date = date('d/m/Y', $item->timecreated);
-                $seconds = $this->format_seconds($daytime);
+                $seconds = $this->format_seconds($timefortheday);
                 array_push($out, array($date, $seconds));
             }
         }
@@ -174,12 +164,25 @@ class generate_time_report extends \core\task\adhoc_task {
         return $out;
     }
 
+    private static function get_nextval($data, $iteration) {
+        $item = array_values($data)[$iteration];
+        if (!isset(array_values($data)[$iteration+1])) {
+            $nextval = $item;
+        } else {
+            $nextval = array_values($data)[$iteration+1];
+        }
+        return $nextval;
+    }
+
+    private function calculate_timefortheday($item, $currentday) {
+        $timefortheday = 0;
+
+    }
+
     private function create_csv($user, $requestorid, $data, $contextid, $startmonth, $endmonth) {
         global $CFG;
-        require_once($CFG->libdir . '/csvlib.class.php');
-        require_once(dirname(__FILE__) . '/../../locallib.php');
-
-        $lib = new \TimeReport();
+        require_once $CFG->libdir . '/csvlib.class.php';
+        require_once dirname(__FILE__) . '/../../locallib.php';
         
         $datestart = \DateTime::createFromFormat('mY', $startmonth);
         $startmonthstr = $datestart->format('m/Y');
@@ -188,12 +191,9 @@ class generate_time_report extends \core\task\adhoc_task {
 
         $delimiter = \csv_import_reader::get_delimiter('comma');
         $csventries = array(array());
-        $csventries[] = array(
-            get_string('name', 'core'),
-            get_string('firstname', 'core'),
-            get_string('email', 'core')
-        );
-        $csventries[] = array($user->firstname, $user->lastname, $user->email);
+        $csventries[] = array(get_string('name', 'core'), $user->lastname);
+        $csventries[] = array(get_string('firstname', 'core'), $user->firstname);
+        $csventries[] = array(get_string('email', 'core'), $user->email);
         $csventries[] = array(get_string('period', 'tool_time_report'), $startmonthstr . ' - ' . $endmonthstr);
         $csventries[] = array(get_string('period_total_time', 'tool_time_report'), $this->format_seconds($this->getTotaltime()));
         $csventries[] = array('Date', get_string('total_duration', 'tool_time_report'));
@@ -209,22 +209,24 @@ class generate_time_report extends \core\task\adhoc_task {
             $returnstr .= '"' . implode('"' . $delimiter . '"', $entry) . '"' . "\n";
         }
         
-        $filename = $lib->generate_file_name($user->id, $startmonth, $endmonth);
+        $filename = generate_file_name($user->id, $startmonth, $endmonth);
 
         return $this->write_new_file($returnstr, $contextid, $filename, $user, $requestorid);
     }
 
-    private function write_new_file($content, $contextid, $name, $user, $requestorid) {
+    private function write_new_file($content, $contextid, $filename, $user, $requestorid) {
         global $CFG;
 
         $fs = get_file_storage();
         $fileinfo = array(
-            'contextid' => $contextid, // ID of context
-            'component' => 'tool_time_report',     // usually = table name
-            'filearea' => 'content',    // usually = table name
-            'itemid' => 0,               // usually = ID of row in table
-            'filepath' => '/',           // any path beginning and ending in /
-            'filename' => $name); // any filename
+            'contextid' => $contextid,
+            'component' => 'tool_time_report',
+            'filearea' => 'content',
+            'itemid' => 0,
+            'filepath' => '/',
+            'filename' => $filename,
+            'userid' => $user->id
+        );
 
         $file = $fs->get_file($fileinfo['contextid'], $fileinfo['component'], $fileinfo['filearea'],
                 $fileinfo['itemid'], $fileinfo['filepath'], $fileinfo['filename']);
@@ -235,32 +237,34 @@ class generate_time_report extends \core\task\adhoc_task {
         }
 
         if ($fs->create_file_from_string($fileinfo, $content)) {
-            $path = "$CFG->wwwroot/pluginfile.php/$contextid/tool_time_report/content/0/$name";
-
-            $fullname = fullname($user);
-            $messagehtml = "<p>" . get_string('messageprovider:user_report_created', 'tool_time_report', $fullname) . "</p>";
-            $messagehtml .= "<p>" . get_string('download', 'core') . " : ";
-            $messagehtml .= "<a href=\"$path\" download><i class=\"fa fa-download\"></i>$name</a></p>";
-            $contexturl = new moodle_url('/admin/tool/time_report/view.php', array('userid' => $user->id));
-
-            $message = new message();
-            $message->component         = 'tool_time_report';
-            $message->name              = 'reportcreation';
-            $message->userfrom          = \core_user::get_noreply_user();
-            $message->userto            = $requestorid;
-            $message->subject           = get_string('messageprovider:reportcreation', 'tool_time_report');
-            $message->fullmessageformat = FORMAT_MARKDOWN;
-            $message->fullmessage       = html_to_text($messagehtml);
-            $message->fullmessagehtml   = $messagehtml;
-            $message->smallmessage      = get_string('messageprovider:report_created', 'tool_time_report');
-            $message->notification      = 1;
-            $message->contexturl        = $contexturl;
-            $message->contexturlname    = get_string('time_report', 'tool_time_report');
-            // Set the file attachment
-            $message->attachment = $file;
-            message_send($message);
+            $path = "$CFG->wwwroot/pluginfile.php/$contextid/tool_time_report/content/0/$filename";
+            $this->generate_message($user, $path, $filename, $file, $requestorid);
         }
 
         return $file;
+    }
+
+    public function generate_message($user, $path, $filename, $file, $requestorid) {
+        $fullname = fullname($user);
+        $messagehtml = "<p>" . get_string('messageprovider:user_report_created', 'tool_time_report', $fullname) . "</p>";
+        $messagehtml .= "<p>" . get_string('download', 'core') . " : ";
+        $messagehtml .= "<a href=\"$path\" download><i class=\"fa fa-download\"></i>$filename</a></p>";
+        $contexturl = new moodle_url('/admin/tool/time_report/view.php', array('userid' => $user->id));
+
+        $message = new message();
+        $message->component         = 'tool_time_report';
+        $message->name              = 'reportcreation';
+        $message->userfrom          = \core_user::get_noreply_user();
+        $message->userto            = $requestorid;
+        $message->subject           = get_string('messageprovider:reportcreation', 'tool_time_report');
+        $message->fullmessageformat = FORMAT_MARKDOWN;
+        $message->fullmessage       = html_to_text($messagehtml);
+        $message->fullmessagehtml   = $messagehtml;
+        $message->smallmessage      = get_string('messageprovider:report_created', 'tool_time_report');
+        $message->notification      = 1;
+        $message->contexturl        = $contexturl;
+        $message->contexturlname    = get_string('time_report', 'tool_time_report');
+        $message->attachment = $file; // Set the file attachment
+        message_send($message);
     }
 }

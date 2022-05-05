@@ -25,19 +25,7 @@
 
     <div id="report-area" class="mt-5 mb-5 alert"></div>
 
-    <div class="mt-5">
-        <h4>{{#str}} reports_list, tool_time_report {{/str}}</h4>
-        <ul class="list-group list-group-flush mt-3">
-            {{#reportfiles}}
-                <li class="list-group-item">
-                    <a href="{{{url}}}">
-                        <i class="fa fa-download pr-2"></i>
-                        {{{filename}}}
-                    </a>
-                </li>
-            {{/reportfiles}}
-        </ul>
-    </div>
+    {{> tool_time_report/reports_list }}
 </div>
 
 {{#js}}

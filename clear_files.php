@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Time Report tool plugin's view.
+ * Reports clearing script.
  *
  * @package   tool_time_report
  * @copyright 2022 Pierre Duverneix - Fondation UNIT
@@ -31,40 +31,12 @@ global $PAGE, $USER;
 
 $id = required_param('userid', PARAM_INT);
 $user = $DB->get_record('user', array('id' => $id), '*', MUST_EXIST);
-$currentuser = ($user->id == $USER->id);
 
 $personalcontext = context_user::instance($user->id);
 if (!has_capability('tool/time_report:view', $personalcontext)) {
     redirect("$CFG->wwwroot/user/profile.php?id=?$user->id");
 }
 
-$systemcontext = context_system::instance();
-$usercontext   = context_user::instance($user->id, IGNORE_MISSING);
-$strpersonalprofile = get_string('personalprofile');
-$headerinfo = array('heading' => fullname($user), 'user' => $user, 'usercontext' => $usercontext);
-$fullname = fullname($user);
-
-$PAGE->set_url('/admin/tool/time_report/view.php', array('userid' => $user->id));
-$PAGE->set_context($usercontext);
-$PAGE->add_body_class('path-user');
-$PAGE->set_title("$strpersonalprofile: $fullname");
-$PAGE->set_heading("$strpersonalprofile: $fullname");
-$PAGE->set_pagelayout('standard');
-$PAGE->set_other_editing_capability('moodle/course:manageactivities');
-
-echo $OUTPUT->header();
-
-$admins = get_admins();
-$is_admin = in_array($user->id, array_keys($admins));
-
-if ($is_admin) {
-    //redirect("$CFG->wwwroot/user/profile.php?id=?$user->id");
-}
-
 $context = \context_system::instance();
-$reportfiles = get_reports_urls($context->id, $user->id);
-$renderable = new \tool_time_report\output\get_report($USER->id, $user->id, $context->id, $reportfiles);
-$output = $PAGE->get_renderer('tool_time_report');
-
-echo $output->render($renderable);
-echo $OUTPUT->footer();
+remove_reports_files($context->id, $user->id);
+redirect("$CFG->wwwroot/admin/tool/time_report/view.php?userid=$user->id");

@@ -63,7 +63,6 @@ class external extends external_api {
      */
     public static function generate_time_report($jsonformdata) {
         require_once(dirname(__FILE__) . '/../locallib.php');
-        $lib = new \TimeReport();
 
         $params = self::validate_parameters(self::generate_time_report_parameters(), [
             'jsonformdata' => $jsonformdata
@@ -71,13 +70,17 @@ class external extends external_api {
 
         $serialiseddata = json_decode($params['jsonformdata'], true);
 
+        if (!$serialiseddata['contextid'] || !$serialiseddata['userid']) {
+            throw new \coding_exception('Missing contextid or userid parameters');
+        }
+
         $fs = get_file_storage();
         $file = $fs->get_file($serialiseddata['contextid'], 
             'tool_time_report', 
             'content', 
             '0', 
             '/', 
-            $lib->generate_file_name($serialiseddata['userid'], $serialiseddata['start'], $serialiseddata['end'])
+            generate_file_name($serialiseddata['userid'], $serialiseddata['start'], $serialiseddata['end'])
         );
         if ($file) {
             // Delete the old file first
@@ -127,7 +130,6 @@ class external extends external_api {
         global $CFG, $DB, $USER;
 
         require_once(dirname(__FILE__) . '/../locallib.php');
-        $lib = new \TimeReport();
 
         $params = self::validate_parameters(self::poll_report_file_parameters(), [
             'jsonformdata' => $jsonformdata
@@ -135,17 +137,21 @@ class external extends external_api {
 
         $serialiseddata = json_decode($params['jsonformdata'], true);
 
+        if (!$serialiseddata['contextid'] || !$serialiseddata['userid']) {
+            throw new \coding_exception('Missing contextid or userid parameters');
+        }
+
         $return = new \stdClass();
         $return->path = '';
         $return->status = false;
 
-        $userid = $serialiseddata['userid'];
         $contextid = $serialiseddata['contextid'];
+        $userid = $serialiseddata['userid'];
 
         $user = $DB->get_record('user', array('id' => $userid), '*', MUST_EXIST);
         if ($user) {
             $fs = get_file_storage();
-            $filename = $lib->generate_file_name($userid, $serialiseddata['start'], $serialiseddata['end']);
+            $filename = generate_file_name($userid, $serialiseddata['start'], $serialiseddata['end']);
             $file = $fs->get_file($contextid, 'tool_time_report', 'content', '0', '/', $filename);
 
             if ($file) {
