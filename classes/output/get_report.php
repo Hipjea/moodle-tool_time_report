@@ -60,7 +60,9 @@ class get_report implements renderable, templatable {
             'requestorid' => $this->requestorid,
             'userid' => $this->userid,
             'contextid' => $this->contextid,
-            'reportfiles' => $this->reportfiles
+            'reportfiles' => $this->reportfiles,
+            'has_reportfiles' => count($this->reportfiles) > 0 ? true : false,
+            'clearingaction' => 'clear_files.php'
         ];
     }
 }
