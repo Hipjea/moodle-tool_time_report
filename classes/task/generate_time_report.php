@@ -110,6 +110,7 @@ class generate_time_report extends \core\task\adhoc_task {
                     $nextvaltimecreated = intval($nextval->timecreated);
                     $itemtimecreated = intval($item->timecreated);
                     $timedelta = $nextvaltimecreated - $itemtimecreated;
+
                     if (intval($timedelta / 60) > 30) {
                         $timefortheday = $timefortheday + self::BORROWED_TIME;
                     } else {
@@ -139,7 +140,8 @@ class generate_time_report extends \core\task\adhoc_task {
                 $timefortheday = 0;
             }
 
-            if ( ($timefortheday > 0 && isset($nextval) && $nextval->logtimecreated != $currentday->logtimecreated) || ($timefortheday > 0 && $nextval == $item) ) {
+            if (($timefortheday > 0 && isset($nextval) && $nextval->logtimecreated != $currentday->logtimecreated) 
+                || ($timefortheday > 0 && $nextval == $item)) {
                 $out = self::push_result($out, $item->timecreated, $timefortheday);
             }
         }
@@ -196,7 +198,7 @@ class generate_time_report extends \core\task\adhoc_task {
             $returnstr .= '"' . implode('"' . $delimiter . '"', $entry) . '"' . "\n";
         }
         
-        $filename = generate_file_name($user->id, $startmonth, $endmonth);
+        $filename = generate_file_name(fullname($user), $startmonth, $endmonth);
 
         return $this->write_new_file($returnstr, $contextid, $filename, $user, $requestorid);
     }
@@ -232,8 +234,7 @@ class generate_time_report extends \core\task\adhoc_task {
 
     public function generate_message($user, $path, $filename, $file, $requestorid) {
         $fullname = fullname($user);
-        $messagehtml = "<p>" . get_string('messageprovider:user_report_created', 'tool_time_report', $fullname) . "</p>";
-        $messagehtml .= "<p>" . get_string('download', 'core') . " : ";
+        $messagehtml = "<p>" . get_string('download', 'core') . " : ";
         $messagehtml .= "<a href=\"$path\" download><i class=\"fa fa-download\"></i>$filename</a></p>";
         $contexturl = new moodle_url('/admin/tool/time_report/view.php', array('userid' => $user->id));
 
@@ -242,8 +243,8 @@ class generate_time_report extends \core\task\adhoc_task {
         $message->name              = 'reportcreation';
         $message->userfrom          = \core_user::get_noreply_user();
         $message->userto            = $requestorid;
-        $message->subject           = get_string('messageprovider:reportcreation', 'tool_time_report');
-        $message->fullmessageformat = FORMAT_MARKDOWN;
+        $message->subject           = get_string('messageprovider:reportcreation', 'tool_time_report'). " : " .$fullname;
+        $message->fullmessageformat = FORMAT_HTML;
         $message->fullmessage       = html_to_text($messagehtml);
         $message->fullmessagehtml   = $messagehtml;
         $message->smallmessage      = get_string('messageprovider:report_created', 'tool_time_report');

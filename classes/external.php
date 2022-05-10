@@ -80,7 +80,7 @@ class external extends external_api {
             'content', 
             '0', 
             '/', 
-            generate_file_name($serialiseddata['userid'], $serialiseddata['start'], $serialiseddata['end'])
+            generate_file_name($serialiseddata['username'], $serialiseddata['start'], $serialiseddata['end'])
         );
         if ($file) {
             // Delete the old file first
@@ -151,7 +151,7 @@ class external extends external_api {
         $user = $DB->get_record('user', array('id' => $userid), '*', MUST_EXIST);
         if ($user) {
             $fs = get_file_storage();
-            $filename = generate_file_name($userid, $serialiseddata['start'], $serialiseddata['end']);
+            $filename = generate_file_name(fullname($user), $serialiseddata['start'], $serialiseddata['end']);
             $file = $fs->get_file($contextid, 'tool_time_report', 'content', '0', '/', $filename);
 
             if ($file) {

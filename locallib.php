@@ -51,11 +51,17 @@ function get_reports_urls($contextid, $userid) {
  * @param  string $enddate
  * @return string
  */
-function generate_file_name($userid, $startdate, $enddate) {
-    if (!$userid) {
-        throw new \coding_exception('Missing userid');
+function generate_file_name($username, $startdate, $enddate) {
+    if (!$username) {
+        throw new \coding_exception('Missing username');
     }
-    return 'report_user_' . $userid . '__' . $startdate . '_' . $enddate . '.csv';
+    return strtolower(get_string('report', 'core')) 
+            . '__' 
+            . to_snake_case($username) 
+            . '__' 
+            . format_readable_date($startdate, 2) 
+            . '_' 
+            . format_readable_date($enddate, 2) . '.csv';
 }
 
 /**
@@ -89,4 +95,34 @@ function remove_reports_files($contextid, $userid) {
             $file->delete();
         }
     }
+}
+
+/**
+ * Generates a snake cased username.
+ *
+ * @param  string $str
+ * @param  string $glue (optional)
+ * @return string
+ */
+function to_snake_case($str, $glue = '_') {
+    $str = preg_replace('/\s+/', '', $str);
+    return ltrim(
+        preg_replace_callback('/[A-Z]/', function ($matches) use ($glue) {
+            return $glue . strtolower($matches[0]);
+        }, $str), $glue
+    );
+}
+
+/**
+ * Adds a hyphen between month and year.
+ *
+ * @param  string $str Date string
+ * @param  string $num Position of the cut off
+ * @return string
+ */
+function format_readable_date($str, $num) {
+    $output[0] = substr($str, 0, $num);
+    $output[1] = '-';
+    $output[2] = substr($str, $num, strlen($str));
+    return implode($output);
 }

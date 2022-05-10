@@ -29,36 +29,25 @@
 </div>
 
 {{#js}}
-require(['jquery', 'tool_time_report/jquery-ui'], function($) {
-    $.datepicker.regional['fr'] = {
-        prevText: '<',
-        nextText: '>',
-        monthNames: ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
-                'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'],
-        monthNamesShort: ['Jan', 'Fev', 'Mar', 'Avr', 'Mai', 'Ju.',
-                'Jui', 'Aou', 'Sep', 'Oct', 'Nov', 'Dec'],
-        dayNames: ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'],
-        dayNamesShort: ['Di', 'Lu', 'Ma', 'Me', 'Je', 'Ve', 'Sa'],
-        dayNamesMin: ['Di', 'Lu', 'Ma', 'Me', 'Je', 'Ve', 'Sa'],
-        currentText: 'Aujourd’hui',
-        closeText: 'Fermer',
-        weekHeader: 'Se',
-        dateFormat: 'mmyy',
-        firstDay: 1,
-        changeMonth: true,
-        changeYear: true,
-        isRTL: false,
-        showMonthAfterYear: false,
-        startDate: '01/01/2017'
-    };
-    $.datepicker.setDefaults($.datepicker.regional['fr']);
+require(['jquery', 'tool_time_report/setup', 'tool_time_report/jquery-ui'], function($, setup, ui) {
+    var stringPromises = setup.init();
+    var presets = setup.getPresets();
 
-    $("#startInput, #endInput").datepicker({
-        changeMonth: true,
-        changeYear: true,
-        showButtonPanel: true,
-        onClose: function(dateText, inst) {
-            $(this).datepicker('setDate', new Date(inst.selectedYear, inst.selectedMonth, 1));
+    $.when(stringPromises).then(function(strings) {
+        presets = setup.setStrings(strings);
+
+        if (presets) {
+            $.datepicker.regional['fr'] = presets;
+            $.datepicker.setDefaults($.datepicker.regional['fr']);
+
+            $("#startInput, #endInput").datepicker({
+                changeMonth: true,
+                changeYear: true,
+                showButtonPanel: true,
+                onClose: function(dateText, inst) {
+                    $(this).datepicker('setDate', new Date(inst.selectedYear, inst.selectedMonth, 1));
+                }
+            });
         }
     });
 });

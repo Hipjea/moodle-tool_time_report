@@ -1,11 +1,13 @@
 define(['jquery',
         'core/ajax',
-        'core/notification'], function($, Ajax, Notification) {
+        'core/str',
+        'core/notification'], function($, Ajax, Str, Notification) {
     "use strict";
 
-    var GenerateReport = function(requestorId, userId, contextId) {
+    var GenerateReport = function(requestorId, userId, userName, contextId) {
         this.requestorId = parseInt(requestorId);
         this.userId = parseInt(userId);
+        this.userName = userName;
         this.start = null;
         this.end = null;
         this.contextId = contextId;
@@ -21,12 +23,16 @@ define(['jquery',
             var endDate = $('#endInput').val();
             var completion = this.checkCompletion(startDate, endDate);
             if (!completion) {
-                return Notification.alert("Erreur", "Saisir les dates de début et de fin de période.");
+                return Notification.alert(
+                    Str.get_string('error'), 
+                    Str.get_string('error:completiondates', 'tool_time_report')
+                );
             }
 
             var formdata = {
                 requestorid: this.requestorId,
                 userid: this.userId,
+                username: this.userName,
                 start: $('#startInput').val(),
                 end: $('#endInput').val(),
                 contextid: this.contextId
@@ -37,8 +43,10 @@ define(['jquery',
                 methodname: 'tool_time_report_generate_time_report',
                 args: { jsonformdata: JSON.stringify(formdata) },
                 done: function() {
-                    $('#report-area').addClass('alert-warning')
-                        .html('<div class="spinner-border text-warning" role="status"></div> Chargement du rapport...');
+                    Str.get_string('client:reportgenerating', 'tool_time_report').done(function(str) {
+                        $('#report-area').addClass('alert-warning')
+                            .html('<div class="spinner-border text-warning" role="status"></div> ' + str);
+                    });
                     var that = this;
                     (function foo() {
                         that.polling = setInterval(pollFile.bind(that), 7500);
@@ -62,8 +70,10 @@ define(['jquery',
             args: { jsonformdata: JSON.stringify(this.formdata) },
             done: function(data) {
                 if (data.status == true) {
-                    $('#report-area').removeClass('alert-warning').addClass('alert-success')
-                        .html('<a href="'+data.path+'" target="_blank"><i class="fa fa-download"></i> Télécharger le rapport</a>');
+                    Str.get_string('client:reportdownload', 'tool_time_report').done(function(str) {
+                        $('#report-area').removeClass('alert-warning').addClass('alert-success')
+                            .html('<a href="'+data.path+'" target="_blank"><i class="fa fa-download"></i> ' + str + '</a>');
+                    });
                     clearInterval(this.polling);
                     return;
                 }
@@ -73,8 +83,8 @@ define(['jquery',
     };
 
     return {
-        generateReport: function(requestorId, userId, contextId) {
-            return new GenerateReport(requestorId, userId, contextId);
+        generateReport: function(requestorId, userId, userName, contextId) {
+            return new GenerateReport(requestorId, userId, userName, contextId);
         }
     };
 });
