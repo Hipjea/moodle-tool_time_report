@@ -37,3 +37,4 @@ $string['total_duration'] = 'Total duration';
 $string['daily_time_report'] = 'Daily time report';
 $string['remove_files'] = 'Remove files';
 $string['messageprovider:report_created'] = 'A time report has been created';
+$string['error:completiondates'] = 'Enter the start and end dates.';

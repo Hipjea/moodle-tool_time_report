@@ -1,6 +1,7 @@
 define(['jquery',
         'core/ajax',
-        'core/notification'], function($, Ajax, Notification) {
+        'core/str',
+        'core/notification'], function($, Ajax, Str, Notification) {
     "use strict";
 
     var GenerateReport = function(requestorId, userId, userName, contextId) {
@@ -22,7 +23,10 @@ define(['jquery',
             var endDate = $('#endInput').val();
             var completion = this.checkCompletion(startDate, endDate);
             if (!completion) {
-                return Notification.alert("Erreur", "Saisir les dates de début et de fin de période.");
+                return Notification.alert(
+                    Str.get_string('error'), 
+                    Str.get_string('error:completiondates', 'tool_time_report')
+                );
             }
 
             var formdata = {
