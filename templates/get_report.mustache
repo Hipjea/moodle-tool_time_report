@@ -37,8 +37,8 @@ require(['jquery', 'tool_time_report/setup', 'tool_time_report/jquery-ui'], func
         presets = setup.setStrings(strings);
 
         if (presets) {
-            $.datepicker.regional['fr'] = presets;
-            $.datepicker.setDefaults($.datepicker.regional['fr']);
+            $.datepicker.regional['{{ lang }}'] = presets;
+            $.datepicker.setDefaults($.datepicker.regional['{{ lang }}']);
 
             $("#startInput, #endInput").datepicker({
                 changeMonth: true,

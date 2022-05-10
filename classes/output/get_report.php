@@ -49,7 +49,8 @@ class get_report implements renderable, templatable {
      * @throws moodle_exception
      */
     public function export_for_template(renderer_base $output) {
-        global $PAGE;
+        global $CFG, $PAGE;
+
         $PAGE->requires->js_call_amd('tool_time_report/generate_report', 'generateReport', [
             $this->requestorid,
             $this->userid,
@@ -65,7 +66,8 @@ class get_report implements renderable, templatable {
             'contextid' => $this->contextid,
             'reportfiles' => $this->reportfiles,
             'has_reportfiles' => count($this->reportfiles) > 0 ? true : false,
-            'clearingaction' => 'clear_files.php'
+            'clearingaction' => 'clear_files.php',
+            'lang' => $CFG->lang
         ];
     }
 }
