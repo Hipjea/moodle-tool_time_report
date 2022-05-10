@@ -43,8 +43,10 @@ define(['jquery',
                 methodname: 'tool_time_report_generate_time_report',
                 args: { jsonformdata: JSON.stringify(formdata) },
                 done: function() {
-                    $('#report-area').addClass('alert-warning')
-                        .html('<div class="spinner-border text-warning" role="status"></div> Chargement du rapport...');
+                    Str.get_string('client:reportgenerating', 'tool_time_report').done(function(str) {
+                        $('#report-area').addClass('alert-warning')
+                            .html('<div class="spinner-border text-warning" role="status"></div> ' + str);
+                    });
                     var that = this;
                     (function foo() {
                         that.polling = setInterval(pollFile.bind(that), 7500);
@@ -68,8 +70,10 @@ define(['jquery',
             args: { jsonformdata: JSON.stringify(this.formdata) },
             done: function(data) {
                 if (data.status == true) {
-                    $('#report-area').removeClass('alert-warning').addClass('alert-success')
-                        .html('<a href="'+data.path+'" target="_blank"><i class="fa fa-download"></i> Télécharger le rapport</a>');
+                    Str.get_string('client:reportdownload', 'tool_time_report').done(function(str) {
+                        $('#report-area').removeClass('alert-warning').addClass('alert-success')
+                            .html('<a href="'+data.path+'" target="_blank"><i class="fa fa-download"></i> ' + str + '</a>');
+                    });
                     clearInterval(this.polling);
                     return;
                 }

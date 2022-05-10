@@ -115,8 +115,8 @@ function to_snake_case($str, $glue = '_') {
  * @return string
  */
 function format_readable_date($str, $num) {
-    $output[0] = substr($string, 0, $num);
+    $output[0] = substr($str, 0, $num);
     $output[1] = '-';
-    $output[2] = substr($string, $num, strlen($string));
+    $output[2] = substr($str, $num, strlen($str));
     return implode($output);
 }

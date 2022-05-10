@@ -37,4 +37,6 @@ $string['total_duration'] = 'Durée cumulée';
 $string['daily_time_report'] = 'Rapport de temps journaliers';
 $string['remove_files'] = 'Supprimer les fichiers';
 $string['messageprovider:report_created'] = 'Un rapport de d’utilisateur a été créé';
+$string['client:reportgenerating'] = 'Génération du rapport...';
+$string['client:reportdownload'] = 'Télécharger le rapport';
 $string['error:completiondates'] = 'Saisir les dates de début et de fin de période.';
