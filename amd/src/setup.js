@@ -1,0 +1,21 @@
+export const presets = {
+    prevText: '<',
+    nextText: '>',
+    monthNames: ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
+            'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'],
+    monthNamesShort: ['Jan', 'Fev', 'Mar', 'Avr', 'Mai', 'Ju.',
+            'Jui', 'Aou', 'Sep', 'Oct', 'Nov', 'Dec'],
+    dayNames: ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'],
+    dayNamesShort: ['Di', 'Lu', 'Ma', 'Me', 'Je', 'Ve', 'Sa'],
+    dayNamesMin: ['Di', 'Lu', 'Ma', 'Me', 'Je', 'Ve', 'Sa'],
+    currentText: 'Aujourd’hui',
+    closeText: 'Fermer',
+    weekHeader: 'Se',
+    dateFormat: 'mmyy',
+    firstDay: 1,
+    changeMonth: true,
+    changeYear: true,
+    isRTL: false,
+    showMonthAfterYear: false,
+    startDate: '01/01/2017'
+};
