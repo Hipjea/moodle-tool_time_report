@@ -3,9 +3,10 @@ define(['jquery',
         'core/notification'], function($, Ajax, Notification) {
     "use strict";
 
-    var GenerateReport = function(requestorId, userId, contextId) {
+    var GenerateReport = function(requestorId, userId, userName, contextId) {
         this.requestorId = parseInt(requestorId);
         this.userId = parseInt(userId);
+        this.userName = userName;
         this.start = null;
         this.end = null;
         this.contextId = contextId;
@@ -27,6 +28,7 @@ define(['jquery',
             var formdata = {
                 requestorid: this.requestorId,
                 userid: this.userId,
+                username: this.userName,
                 start: $('#startInput').val(),
                 end: $('#endInput').val(),
                 contextid: this.contextId
@@ -73,8 +75,8 @@ define(['jquery',
     };
 
     return {
-        generateReport: function(requestorId, userId, contextId) {
-            return new GenerateReport(requestorId, userId, contextId);
+        generateReport: function(requestorId, userId, userName, contextId) {
+            return new GenerateReport(requestorId, userId, userName, contextId);
         }
     };
 });

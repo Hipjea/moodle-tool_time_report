@@ -35,5 +35,5 @@ $string['period'] = 'Period';
 $string['period_total_time'] = 'Total duration for the period';
 $string['total_duration'] = 'Total duration';
 $string['daily_time_report'] = 'Daily time report';
+$string['remove_files'] = 'Remove files';
 $string['messageprovider:report_created'] = 'A time report has been created';
-$string['messageprovider:user_report_created'] = 'The report for the user <strong>${a}</strong> has been created.';

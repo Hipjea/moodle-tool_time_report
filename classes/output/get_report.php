@@ -32,9 +32,10 @@ use stdClass;
 
 class get_report implements renderable, templatable {
 
-    public function __construct($requestorid, $userid, $contextid, $reportfiles) {
+    public function __construct($requestorid, $userid, $username, $contextid, $reportfiles) {
         $this->requestorid = $requestorid;
         $this->userid = $userid;
+        $this->username = $username;
         $this->contextid = $contextid;
         $this->reportfiles = $reportfiles;
     }
@@ -52,6 +53,7 @@ class get_report implements renderable, templatable {
         $PAGE->requires->js_call_amd('tool_time_report/generate_report', 'generateReport', [
             $this->requestorid,
             $this->userid,
+            $this->username,
             $this->contextid,
             $this->reportfiles
         ]);
@@ -59,6 +61,7 @@ class get_report implements renderable, templatable {
         return [
             'requestorid' => $this->requestorid,
             'userid' => $this->userid,
+            'username' => $this->username,
             'contextid' => $this->contextid,
             'reportfiles' => $this->reportfiles,
             'has_reportfiles' => count($this->reportfiles) > 0 ? true : false,

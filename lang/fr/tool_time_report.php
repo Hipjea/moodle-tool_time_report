@@ -35,5 +35,5 @@ $string['period'] = 'Période';
 $string['period_total_time'] = 'Temps total pour la période';
 $string['total_duration'] = 'Durée cumulée';
 $string['daily_time_report'] = 'Rapport de temps journaliers';
+$string['remove_files'] = 'Supprimer les fichiers';
 $string['messageprovider:report_created'] = 'Un rapport de d’utilisateur a été créé';
-$string['messageprovider:user_report_created'] = 'Le rapport de l’utilisateur <strong>${a}</strong> a été créé.';
