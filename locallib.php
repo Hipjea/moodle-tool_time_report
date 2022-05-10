@@ -107,7 +107,14 @@ function to_snake_case($str, $glue = '_') {
     );
 }
 
-function format_readable_date($string, $num) {
+/**
+ * Adds a hyphen between month and year.
+ *
+ * @param  string $str Date string
+ * @param  string $num Position of the cut off
+ * @return string
+ */
+function format_readable_date($str, $num) {
     $output[0] = substr($string, 0, $num);
     $output[1] = '-';
     $output[2] = substr($string, $num, strlen($string));
