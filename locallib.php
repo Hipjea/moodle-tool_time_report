@@ -55,7 +55,13 @@ function generate_file_name($username, $startdate, $enddate) {
     if (!$username) {
         throw new \coding_exception('Missing username');
     }
-    return 'report__' . to_snake_case($username) . '__' . format_readable_date($startdate, 2) . '_' . format_readable_date($enddate, 2) . '.csv';
+    return strtolower(get_string('report', 'core')) 
+            . '__' 
+            . to_snake_case($username) 
+            . '__' 
+            . format_readable_date($startdate, 2) 
+            . '_' 
+            . format_readable_date($enddate, 2) . '.csv';
 }
 
 /**
