@@ -127,7 +127,11 @@ function format_readable_date($str, $num) {
     return implode($output);
 }
 
-
+/**
+ * Get all the targets names of the logstore_standard_log table
+ *
+ * @return Array of string
+ */
 function get_targets() {
     global $DB;
     $sql = 'SELECT DISTINCT(target) FROM `mdl_logstore_standard_log`';
