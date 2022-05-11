@@ -8,7 +8,7 @@ use core\message\message;
 use moodle_url;
 
 class generate_time_report extends \core\task\adhoc_task {
- 
+
     const BORROWED_TIME = 900;
 
     public $totaltime = 0;
@@ -22,8 +22,8 @@ class generate_time_report extends \core\task\adhoc_task {
     }
 
     private function get_time_spent($userid, $startmonth, $endmonth) {
-        global $DB;
-        
+        require_once dirname(__FILE__) . '/../../locallib.php';
+
         if (!isset($startmonth)) {
             $startmonth = date('mY');
         }
@@ -31,27 +31,14 @@ class generate_time_report extends \core\task\adhoc_task {
             $endmonth = date('mY');
         }
 
-        $lastday = date(date('t', strtotime('01')) .'-' . $endmonth[0] . $endmonth[1] . '-' . $endmonth[2] . $endmonth[3] . $endmonth[4] . $endmonth[5]);
+        $lastday = date(
+            date('t', strtotime('01')).'-'.$endmonth[0].$endmonth[1].'-'.$endmonth[2].$endmonth[3].$endmonth[4].$endmonth[5]
+        );
         $startdate = \DateTime::createFromFormat('dmY', '01'.$startmonth);
         $enddate = \DateTime::createFromFormat('dmY', $lastday[0].$lastday[1].$endmonth);
         $startdate = $startdate->getTimestamp();
         $enddate = $enddate->getTimestamp();
-
-        $sql = 'SELECT {logstore_standard_log}.id, {logstore_standard_log}.timecreated, 
-                {logstore_standard_log}.courseid, 
-                DATE_FORMAT(FROM_UNIXTIME({logstore_standard_log}.timecreated), "%Y%m") AS datecreated, 
-                DATE(FROM_UNIXTIME({logstore_standard_log}.timecreated)) AS logtimecreated, 
-                {logstore_standard_log}.userid, {user}.email, {course}.fullname 
-                FROM {logstore_standard_log} 
-                INNER JOIN {course} ON {logstore_standard_log}.courseid = {course}.id 
-                LEFT OUTER JOIN {user} ON {logstore_standard_log}.userid = {user}.id 
-                WHERE {logstore_standard_log}.userid = ? 
-                AND {logstore_standard_log}.timecreated BETWEEN ? AND ? 
-                AND {logstore_standard_log}.courseid <> 1 
-                ORDER BY {logstore_standard_log}.timecreated ASC';
-            
-        $results = $DB->get_records_sql($sql, array($userid, $startdate, $enddate));
-        return $results;
+        return get_log_records($userid, $startdate, $enddate);
     }
 
     /**

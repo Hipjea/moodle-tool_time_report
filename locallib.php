@@ -126,3 +126,40 @@ function format_readable_date($str, $num) {
     $output[2] = substr($str, $num, strlen($str));
     return implode($output);
 }
+
+/**
+ * Get the log records
+ *
+ * @param  int $userid
+ * @param  string $startdate
+ * @param  string $enddate
+ * @return Array of objects
+ */
+function get_log_records($userid, $startdate, $enddate) {
+    global $DB;
+    $sql = 'SELECT {logstore_standard_log}.id, {logstore_standard_log}.timecreated, 
+            {logstore_standard_log}.courseid, 
+            DATE_FORMAT(FROM_UNIXTIME({logstore_standard_log}.timecreated), "%Y%m") AS datecreated, 
+            DATE(FROM_UNIXTIME({logstore_standard_log}.timecreated)) AS logtimecreated, 
+            {logstore_standard_log}.userid, {user}.email, {course}.fullname 
+            FROM {logstore_standard_log} 
+            INNER JOIN {course} ON {logstore_standard_log}.courseid = {course}.id 
+            LEFT OUTER JOIN {user} ON {logstore_standard_log}.userid = {user}.id 
+            WHERE {logstore_standard_log}.userid = ? 
+            AND {logstore_standard_log}.timecreated BETWEEN ? AND ? 
+            AND {logstore_standard_log}.courseid <> 1 
+            ORDER BY {logstore_standard_log}.timecreated ASC';
+    return $DB->get_records_sql($sql, array($userid, $startdate, $enddate));
+}
+
+/**
+ * Get all the targets names of the logstore_standard_log table
+ *
+ * @return Array of string
+ */
+function get_targets() {
+    global $DB;
+    $sql = 'SELECT DISTINCT(target) FROM `mdl_logstore_standard_log`';
+    $results = $DB->get_records_sql($sql);
+    return array_column($results, 'target');
+}
