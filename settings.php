@@ -36,8 +36,9 @@ if ($hassiteconfig) {
             'tool_time_report/targets',
             new lang_string('settings:targets', 'tool_time_report'),
             new lang_string('settings:targets', 'tool_time_report'),
-            array($targets[0]),
-            $targets));
+            $targets,
+            $targets)
+        );
     }
 
     $ADMIN->add('reports', $settingspage);
