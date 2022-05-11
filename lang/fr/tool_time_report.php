@@ -40,6 +40,7 @@ $string['messageprovider:report_created'] = 'Un rapport de d’utilisateur a ét
 $string['client:reportgenerating'] = 'Génération du rapport...';
 $string['client:reportdownload'] = 'Télécharger le rapport';
 $string['error:completiondates'] = 'Saisir les dates de début et de fin de période.';
+$string['settings:targets'] = 'Report targets';
 
 $string['datepicker:january'] = 'Janvier';
 $string['datepicker:february'] = 'Février';

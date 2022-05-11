@@ -15,13 +15,30 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Time Report tool plugin's tasks file.
+ * Settings script.
  *
  * @package   tool_time_report
  * @copyright 2022 Pierre Duverneix - Fondation UNIT
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+defined('MOODLE_INTERNAL') || die;
+require_once dirname(__FILE__) . '/locallib.php';
 
-$tasks = [];
+if ($hassiteconfig) {
+    $ADMIN->add('reports', new admin_category('tool_time_report', new lang_string('pluginname', 'tool_time_report')));
+    $settingspage = new admin_settingpage('manage_tool_time_report', new lang_string('pluginname', 'tool_time_report'));
+
+    if ($ADMIN->fulltree) {
+        $targets = get_targets();
+
+        $settingspage->add(new admin_setting_configmultiselect(
+            'tool_time_report/targets',
+            new lang_string('settings:targets', 'tool_time_report'),
+            new lang_string('settings:targets', 'tool_time_report'),
+            array($targets[0]),
+            $targets));
+    }
+
+    $ADMIN->add('reports', $settingspage);
+}

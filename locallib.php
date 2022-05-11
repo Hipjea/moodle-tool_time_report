@@ -126,3 +126,11 @@ function format_readable_date($str, $num) {
     $output[2] = substr($str, $num, strlen($str));
     return implode($output);
 }
+
+
+function get_targets() {
+    global $DB;
+    $sql = 'SELECT DISTINCT(target) FROM `mdl_logstore_standard_log`';
+    $results = $DB->get_records_sql($sql);
+    return array_column($results, 'target');
+}
