@@ -153,7 +153,7 @@ function get_log_records($userid, $startdate, $enddate) {
 
     if (count($allowedtargets) > 0) {
         $targets = implode('","', $allowedtargets);
-        $sql .= 'AND {logstore_standard_log}.target IN ("'.$targets.'")';
+        $sql .= 'AND {logstore_standard_log}.target IN ("'.$targets.'") ';
     }
 
     $sql .= 'ORDER BY {logstore_standard_log}.timecreated ASC';
