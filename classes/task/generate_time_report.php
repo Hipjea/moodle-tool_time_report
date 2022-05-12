@@ -38,6 +38,7 @@ class generate_time_report extends \core\task\adhoc_task {
         $enddate = \DateTime::createFromFormat('dmY', $lastday[0].$lastday[1].$endmonth);
         $startdate = $startdate->getTimestamp();
         $enddate = $enddate->getTimestamp();
+
         return get_log_records($userid, $startdate, $enddate);
     }
 
@@ -84,51 +85,40 @@ class generate_time_report extends \core\task\adhoc_task {
         for ($i; $i < $length; $i++) {
             $item = array_values($data)[$i];
             $nextval = self::get_nextval($data, $i);
-
+        
             // Last iteration
             if ($item->id == $nextval->id) {
+                $totaltime = $totaltime + $timefortheday;
                 $out = self::push_result($out, $item->timecreated, $timefortheday);
                 break;
             }
-
-            // If the item log time is equal to the current day time.
-            if ($item->logtimecreated == $currentday->logtimecreated) {
-                if (isset($nextval) && $nextval->logtimecreated == $currentday->logtimecreated) {
-                    $nextvaltimecreated = intval($nextval->timecreated);
-                    $itemtimecreated = intval($item->timecreated);
-                    $timedelta = $nextvaltimecreated - $itemtimecreated;
-
-                    if (intval($timedelta / 60) > 30) {
-                        $timefortheday = $timefortheday + self::BORROWED_TIME;
-                    } else {
-                        $newdaytime = $timefortheday + $nextvaltimecreated - $itemtimecreated;
-                        if ($timefortheday == $newdaytime) {
-                            continue;
-                        } else {
-                            $timefortheday = $timefortheday + $nextvaltimecreated - $itemtimecreated;
-                            if ($newdaytime < intval($timefortheday + 30)) {
-                                continue;
-                            }
-                        }
-                    }
-                }
-                
-                if ($timefortheday > 0) {
-                    // Calculate total time.
-                    if ($i+1 < $length && $nextval) {
-                        if ($currentday->logtimecreated != $nextval->logtimecreated) {
-                            $totaltime = $totaltime + $timefortheday;
-                        }
-                    }
-                }
-            } else { 
-                // If the item log time is different of the current day time.
+        
+            // If the item log time is different than the current day time, we move forward
+            if ($item->logtimecreated != $currentday->logtimecreated) {
                 $currentday = $item;
                 $timefortheday = 0;
             }
-
+        
+            if (isset($nextval) && $nextval->logtimecreated == $currentday->logtimecreated) {
+                $nextvaltimecreated = intval($nextval->timecreated);
+                $itemtimecreated = intval($item->timecreated);
+                $timedelta = $nextvaltimecreated - $itemtimecreated;
+        
+                if (intval($timedelta / 60) > 30) {
+                    $timefortheday = $timefortheday + self::BORROWED_TIME;
+                } else {
+                    $tmpdaytime = $timefortheday + $nextvaltimecreated - $itemtimecreated;
+                    if ($tmpdaytime < intval($timefortheday + 30)) {
+                        continue;
+                    } else {
+                        $timefortheday = $tmpdaytime;
+                    }
+                }
+            }
+        
             if (($timefortheday > 0 && isset($nextval) && $nextval->logtimecreated != $currentday->logtimecreated) 
                 || ($timefortheday > 0 && $nextval == $item)) {
+                $totaltime = $totaltime + $timefortheday;
                 $out = self::push_result($out, $item->timecreated, $timefortheday);
             }
         }

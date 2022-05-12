@@ -137,6 +137,8 @@ function format_readable_date($str, $num) {
  */
 function get_log_records($userid, $startdate, $enddate) {
     global $DB;
+    $allowedtargets = get_allowed_targets();
+
     $sql = 'SELECT {logstore_standard_log}.id, {logstore_standard_log}.timecreated, 
             {logstore_standard_log}.courseid, 
             DATE_FORMAT(FROM_UNIXTIME({logstore_standard_log}.timecreated), "%Y%m") AS datecreated, 
@@ -147,8 +149,14 @@ function get_log_records($userid, $startdate, $enddate) {
             LEFT OUTER JOIN {user} ON {logstore_standard_log}.userid = {user}.id 
             WHERE {logstore_standard_log}.userid = ? 
             AND {logstore_standard_log}.timecreated BETWEEN ? AND ? 
-            AND {logstore_standard_log}.courseid <> 1 
-            ORDER BY {logstore_standard_log}.timecreated ASC';
+            AND {logstore_standard_log}.courseid <> 1 ';
+
+    if (count($allowedtargets) > 0) {
+        $targets = implode('","', $allowedtargets);
+        $sql .= 'AND {logstore_standard_log}.target IN ("'.$targets.'")';
+    }
+
+    $sql .= 'ORDER BY {logstore_standard_log}.timecreated ASC';
     return $DB->get_records_sql($sql, array($userid, $startdate, $enddate));
 }
 
@@ -162,4 +170,22 @@ function get_targets() {
     $sql = 'SELECT DISTINCT(target) FROM `mdl_logstore_standard_log`';
     $results = $DB->get_records_sql($sql);
     return array_column($results, 'target');
+}
+
+/**
+ * Get all the selected targets according to the settings
+ *
+ * @return Array of string
+ */
+function get_allowed_targets() {
+    $allowedtargets = explode (",", get_config('tool_time_report', 'targets'));
+    $targets = get_targets();
+    $filteredtargets = array_filter(
+        $targets,
+        function ($key) use ($allowedtargets) {
+            return in_array($key, $allowedtargets);
+        },
+        ARRAY_FILTER_USE_KEY
+    );
+    return $filteredtargets;
 }
