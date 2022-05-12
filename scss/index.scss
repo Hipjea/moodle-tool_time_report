@@ -1,3 +1,41 @@
+$main-color:   rgb(35, 26, 49);
+$bg-color:     rgb(244, 244, 244);
+$shadow-color: rgba(176, 176, 176, .5);
+
+@mixin spinMix($name) {
+    @-ms-keyframes #{$name} {
+        @content;
+    }
+    @-moz-keyframes #{$name} {
+        @content;
+    }
+    @-webkit-keyframes #{$name} {
+        @content;
+    }
+    @keyframes #{$name} {
+        @content;
+    }
+}
+
+@mixin spinAnimation($name, $duration) {
+    -webkit-animation-name: $name;
+    -webkit-animation-duration: $duration;
+    -webkit-animation-iteration-count: infinite;
+    -webkit-animation-timing-function: linear;
+    -moz-animation-name: $name;
+    -moz-animation-duration: $duration;
+    -moz-animation-iteration-count: infinite;
+    -moz-animation-timing-function: linear;
+    -ms-animation-name: $name;
+    -ms-animation-duration: $duration;
+    -ms-animation-iteration-count: infinite;
+    -ms-animation-timing-function: linear;
+    animation-name: $name;
+    animation-duration: $duration;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
+}
+
 .ui-datepicker-calendar {
     .ui-state-disabled {
         cursor: default !important;
@@ -20,30 +58,14 @@ input.ui-button {
 .tool_time_report_icon {
     height: 1em;
     margin-right: 5px;
-    -webkit-animation-name: spin;
-    -webkit-animation-duration: 2000ms;
-    -webkit-animation-iteration-count: infinite;
-    -webkit-animation-timing-function: linear;
-    -moz-animation-name: spin;
-    -moz-animation-duration: 2000ms;
-    -moz-animation-iteration-count: infinite;
-    -moz-animation-timing-function: linear;
-    -ms-animation-name: spin;
-    -ms-animation-duration: 2000ms;
-    -ms-animation-iteration-count: infinite;
-    -ms-animation-timing-function: linear;
-    animation-name: spin;
-    animation-duration: 2000ms;
-    animation-iteration-count: infinite;
-    animation-timing-function: linear;
+    animation: none;
+
+    &.loader {
+        @include spinAnimation(spin, 2000ms);
+    }
 }
 
-.tool_time_report_download {
-    height: 1em;
-    margin-right: 5px;
-}
-  
-@-ms-keyframes spin {
+@include spinMix(spin) {
     from {
         -ms-transform: rotate(0deg);
     }
@@ -52,36 +74,9 @@ input.ui-button {
     }
 }
 
-@-moz-keyframes spin {
-    from {
-        -moz-transform: rotate(0deg);
-    }
-    to {
-        -moz-transform: rotate(360deg);
-    }
-}
-
-@-webkit-keyframes spin {
-    from {
-        -webkit-transform: rotate(0deg);
-    }
-    to {
-        -webkit-transform: rotate(360deg);
-    }
-}
-
-@keyframes spin {
-    from {
-        transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg);
-    }
-}
-
 .ui-datepicker {
-    box-shadow: 1px 2px 4px rgba(176,176,176,.5);
-    background-color: #f4f4f4;
+    box-shadow: 1px 2px 4px $shadow-color;
+    background-color: $bg-color;
     width: 17em;
     padding: .2em .2em 0;
     display: none;
@@ -181,8 +176,8 @@ input.ui-button {
             overflow: visible;
             border: 0;
             border-radius: 4px;
-            background-color: #231a31;
-            color: #FFFFFF;
+            background-color: $main-color;
+            color: rgb(255, 255, 255);
 
             &.ui-datepicker-current {
                 float: left;

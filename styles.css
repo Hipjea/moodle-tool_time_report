@@ -14,6 +14,9 @@ input.ui-button.ui-icon-notext .ui-icon {
 .tool_time_report_icon {
   height: 1em;
   margin-right: 5px;
+  animation: none;
+}
+.tool_time_report_icon.loader {
   -webkit-animation-name: spin;
   -webkit-animation-duration: 2000ms;
   -webkit-animation-iteration-count: infinite;
@@ -32,11 +35,6 @@ input.ui-button.ui-icon-notext .ui-icon {
   animation-timing-function: linear;
 }
 
-.tool_time_report_download {
-  height: 1em;
-  margin-right: 5px;
-}
-
 @-ms-keyframes spin {
   from {
     -ms-transform: rotate(0deg);
@@ -47,26 +45,26 @@ input.ui-button.ui-icon-notext .ui-icon {
 }
 @-moz-keyframes spin {
   from {
-    -moz-transform: rotate(0deg);
+    -ms-transform: rotate(0deg);
   }
   to {
-    -moz-transform: rotate(360deg);
+    -ms-transform: rotate(360deg);
   }
 }
 @-webkit-keyframes spin {
   from {
-    -webkit-transform: rotate(0deg);
+    -ms-transform: rotate(0deg);
   }
   to {
-    -webkit-transform: rotate(360deg);
+    -ms-transform: rotate(360deg);
   }
 }
 @keyframes spin {
   from {
-    transform: rotate(0deg);
+    -ms-transform: rotate(0deg);
   }
   to {
-    transform: rotate(360deg);
+    -ms-transform: rotate(360deg);
   }
 }
 .ui-datepicker {
@@ -158,7 +156,7 @@ input.ui-button.ui-icon-notext .ui-icon {
   border: 0;
   border-radius: 4px;
   background-color: #231a31;
-  color: #FFFFFF;
+  color: white;
 }
 .ui-datepicker .ui-datepicker-buttonpane button.ui-datepicker-current {
   float: left;

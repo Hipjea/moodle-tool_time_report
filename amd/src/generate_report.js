@@ -27,7 +27,7 @@ define(['jquery',
             var icon = $('<img/>');
             icon.attr('alt', 'loading');
             icon.attr('title', 'loading');
-            icon.attr('class', 'tool_time_report_icon');
+            icon.attr('class', 'tool_time_report_icon loader');
             icon.attr('src', Url.imageUrl('loading', 'tool_time_report'));
 
             if (!completion) {
@@ -76,7 +76,7 @@ define(['jquery',
         var dlicon = $('<img/>');
         dlicon.attr('alt', 'download');
         dlicon.attr('title', 'download');
-        dlicon.attr('class', 'tool_time_report_download');
+        dlicon.attr('class', 'tool_time_report_icon');
         dlicon.attr('src', Url.imageUrl('download', 'tool_time_report'));
 
         Ajax.call([{
