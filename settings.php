@@ -36,7 +36,7 @@ if ($hassiteconfig) {
             'tool_time_report/targets',
             new lang_string('settings:targets', 'tool_time_report'),
             new lang_string('settings:targets', 'tool_time_report'),
-            $targets,
+            [],
             $targets)
         );
     }

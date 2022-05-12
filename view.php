@@ -40,27 +40,28 @@ if (!has_capability('tool/time_report:view', $personalcontext)) {
 
 $systemcontext = context_system::instance();
 $usercontext   = context_user::instance($user->id, IGNORE_MISSING);
-$strpersonalprofile = get_string('personalprofile');
-$headerinfo = array('heading' => fullname($user), 'user' => $user, 'usercontext' => $usercontext);
-$fullname = fullname($user);
+$strprofile    = get_string('personalprofile');
+$headerinfo    = array('heading' => fullname($user), 'user' => $user, 'usercontext' => $usercontext);
+$fullname      = fullname($user);
 
 $PAGE->set_url('/admin/tool/time_report/view.php', array('userid' => $user->id));
 $PAGE->set_context($usercontext);
 $PAGE->add_body_class('path-user');
-$PAGE->set_title("$strpersonalprofile: $fullname");
-$PAGE->set_heading("$strpersonalprofile: $fullname");
+$PAGE->set_title("$strprofile: $fullname");
+$PAGE->set_heading("$strprofile: $fullname");
 $PAGE->set_pagelayout('standard');
 $PAGE->set_other_editing_capability('moodle/course:manageactivities');
 
 echo $OUTPUT->header();
 
+// Disallow the view page on admin accounts.
 $admins = get_admins();
 $is_admin = in_array($user->id, array_keys($admins));
-
 if ($is_admin) {
-    redirect("$CFG->wwwroot/user/profile.php?id=?$user->id");
+    redirect("$CFG->wwwroot/user/profile.php?id=$user->id");
 }
 
+// Rendering.
 $context = \context_system::instance();
 $reportfiles = get_reports_urls($context->id, $user->id);
 $renderable = new \tool_time_report\output\get_report($USER->id, $user->id, fullname($user), $context->id, $reportfiles);

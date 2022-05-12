@@ -183,7 +183,12 @@ function get_allowed_targets() {
     $filteredtargets = array_filter(
         $targets,
         function ($key) use ($allowedtargets) {
-            return in_array($key, $allowedtargets);
+            if (in_array($key, $allowedtargets)) {
+                if ($allowedtargets[$key] == "") {
+                    return false;
+                }
+                return true;
+            }
         },
         ARRAY_FILTER_USE_KEY
     );
