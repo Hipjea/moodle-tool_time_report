@@ -54,13 +54,14 @@ $PAGE->set_other_editing_capability('moodle/course:manageactivities');
 
 echo $OUTPUT->header();
 
+// Disallow the view page on admin accounts.
 $admins = get_admins();
 $is_admin = in_array($user->id, array_keys($admins));
-
 if ($is_admin) {
     redirect("$CFG->wwwroot/user/profile.php?id=$user->id");
 }
 
+// Rendering.
 $context = \context_system::instance();
 $reportfiles = get_reports_urls($context->id, $user->id);
 $renderable = new \tool_time_report\output\get_report($USER->id, $user->id, fullname($user), $context->id, $reportfiles);
