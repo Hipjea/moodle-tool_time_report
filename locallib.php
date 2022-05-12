@@ -184,7 +184,7 @@ function get_allowed_targets() {
         $targets,
         function ($key) use ($allowedtargets) {
             if (in_array($key, $allowedtargets)) {
-                if ($allowedtargets[$key] == "") {
+                if ($allowedtargets[0] && $allowedtargets[0] == "") {
                     return false;
                 }
                 return true;
