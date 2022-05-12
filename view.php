@@ -40,15 +40,15 @@ if (!has_capability('tool/time_report:view', $personalcontext)) {
 
 $systemcontext = context_system::instance();
 $usercontext   = context_user::instance($user->id, IGNORE_MISSING);
-$strpersonalprofile = get_string('personalprofile');
-$headerinfo = array('heading' => fullname($user), 'user' => $user, 'usercontext' => $usercontext);
-$fullname = fullname($user);
+$strprofile    = get_string('personalprofile');
+$headerinfo    = array('heading' => fullname($user), 'user' => $user, 'usercontext' => $usercontext);
+$fullname      = fullname($user);
 
 $PAGE->set_url('/admin/tool/time_report/view.php', array('userid' => $user->id));
 $PAGE->set_context($usercontext);
 $PAGE->add_body_class('path-user');
-$PAGE->set_title("$strpersonalprofile: $fullname");
-$PAGE->set_heading("$strpersonalprofile: $fullname");
+$PAGE->set_title("$strprofile: $fullname");
+$PAGE->set_heading("$strprofile: $fullname");
 $PAGE->set_pagelayout('standard');
 $PAGE->set_other_editing_capability('moodle/course:manageactivities');
 
@@ -58,7 +58,7 @@ $admins = get_admins();
 $is_admin = in_array($user->id, array_keys($admins));
 
 if ($is_admin) {
-    redirect("$CFG->wwwroot/user/profile.php?id=?$user->id");
+    redirect("$CFG->wwwroot/user/profile.php?id=$user->id");
 }
 
 $context = \context_system::instance();
