@@ -1,8 +1,9 @@
 define(['jquery',
         'core/ajax',
+        'core/notification',
         'core/str',
-        'core/notification'], function($, Ajax, Str, Notification) {
-    "use strict";
+        'core/url'], function($, Ajax, Notification, Str, Url) {
+    'use strict';
 
     var GenerateReport = function(requestorId, userId, userName, contextId) {
         this.requestorId = parseInt(requestorId);
@@ -22,6 +23,13 @@ define(['jquery',
             var startDate = $('#startInput').val();
             var endDate = $('#endInput').val();
             var completion = this.checkCompletion(startDate, endDate);
+
+            var icon = $('<img/>');
+            icon.attr('alt', 'loading');
+            icon.attr('title', 'loading');
+            icon.attr('class', 'tool_time_report_icon loader');
+            icon.attr('src', Url.imageUrl('loading', 'tool_time_report'));
+
             if (!completion) {
                 return Notification.alert(
                     Str.get_string('error'), 
@@ -45,7 +53,7 @@ define(['jquery',
                 done: function() {
                     Str.get_string('client:reportgenerating', 'tool_time_report').done(function(str) {
                         $('#report-area').addClass('alert-warning')
-                            .html('<div class="spinner-border text-warning" role="status"></div> ' + str);
+                            .html(str).prepend(icon);
                     });
                     var that = this;
                     (function foo() {
@@ -65,14 +73,21 @@ define(['jquery',
     };
 
     var pollFile = function() {
+        var dlicon = $('<img/>');
+        dlicon.attr('alt', 'download');
+        dlicon.attr('title', 'download');
+        dlicon.attr('class', 'tool_time_report_icon');
+        dlicon.attr('src', Url.imageUrl('download', 'tool_time_report'));
+
         Ajax.call([{
             methodname: 'tool_time_report_poll_report_file',
             args: { jsonformdata: JSON.stringify(this.formdata) },
             done: function(data) {
                 if (data.status == true) {
                     Str.get_string('client:reportdownload', 'tool_time_report').done(function(str) {
+                        var content = $('<a href="'+data.path+'" target="_blank">' + str + '</a>').prepend(dlicon);
                         $('#report-area').removeClass('alert-warning').addClass('alert-success')
-                            .html('<a href="'+data.path+'" target="_blank"><i class="fa fa-download"></i> ' + str + '</a>');
+                            .html(content);
                     });
                     clearInterval(this.polling);
                     return;
