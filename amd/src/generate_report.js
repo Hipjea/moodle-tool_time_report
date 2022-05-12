@@ -3,7 +3,7 @@ define(['jquery',
         'core/notification',
         'core/str',
         'core/url'], function($, Ajax, Notification, Str, Url) {
-    "use strict";
+    'use strict';
 
     var GenerateReport = function(requestorId, userId, userName, contextId) {
         this.requestorId = parseInt(requestorId);
@@ -27,6 +27,7 @@ define(['jquery',
             var icon = $('<img/>');
             icon.attr('alt', 'loading');
             icon.attr('title', 'loading');
+            icon.attr('class', 'tool_time_report_icon');
             icon.attr('src', Url.imageUrl('loading', 'tool_time_report'));
 
             if (!completion) {
@@ -75,6 +76,7 @@ define(['jquery',
         var icon = $('<img/>');
         icon.attr('alt', 'download');
         icon.attr('title', 'download');
+        icon.attr('class', 'tool_time_report_download');
         icon.attr('src', Url.imageUrl('download', 'tool_time_report'));
 
         Ajax.call([{
