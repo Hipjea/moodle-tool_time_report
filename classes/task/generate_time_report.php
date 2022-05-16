@@ -85,25 +85,25 @@ class generate_time_report extends \core\task\adhoc_task {
         for ($i; $i < $length; $i++) {
             $item = array_values($data)[$i];
             $nextval = self::get_nextval($data, $i);
-        
+
             // Last iteration
             if ($item->id == $nextval->id) {
                 $totaltime = $totaltime + $timefortheday;
                 $out = self::push_result($out, $item->timecreated, $timefortheday);
                 break;
             }
-        
+
             // If the item log time is different than the current day time, we move forward
             if ($item->logtimecreated != $currentday->logtimecreated) {
                 $currentday = $item;
                 $timefortheday = 0;
             }
-        
+
             if (isset($nextval) && $nextval->logtimecreated == $currentday->logtimecreated) {
                 $nextvaltimecreated = intval($nextval->timecreated);
                 $itemtimecreated = intval($item->timecreated);
                 $timedelta = $nextvaltimecreated - $itemtimecreated;
-        
+
                 if (intval($timedelta / 60) > 30) {
                     $timefortheday = $timefortheday + self::BORROWED_TIME;
                 } else {
@@ -115,7 +115,7 @@ class generate_time_report extends \core\task\adhoc_task {
                     }
                 }
             }
-        
+
             if (($timefortheday > 0 && isset($nextval) && $nextval->logtimecreated != $currentday->logtimecreated) 
                 || ($timefortheday > 0 && $nextval == $item)) {
                 $totaltime = $totaltime + $timefortheday;
