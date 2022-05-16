@@ -40,8 +40,8 @@ $string['messageprovider:report_created'] = 'Un rapport de d’utilisateur a ét
 $string['client:reportgenerating'] = 'Génération du rapport...';
 $string['client:reportdownload'] = 'Télécharger le rapport';
 $string['error:completiondates'] = 'Saisir les dates de début et de fin de période.';
-$string['settings:targets'] = 'Report targets';
-
+$string['settings:targets'] = 'Composants comptabilisés';
+$string['settings:targets_desc'] = 'Les composants cibles comptabilisés dans le rapport.';
 $string['datepicker:january'] = 'Janvier';
 $string['datepicker:february'] = 'Février';
 $string['datepicker:march'] = 'Mars';
