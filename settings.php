@@ -31,12 +31,13 @@ if ($hassiteconfig) {
 
     if ($ADMIN->fulltree) {
         $targets = get_targets();
+        $defaulttargets = array_keys($targets);
 
         $settingspage->add(new admin_setting_configmultiselect(
             'tool_time_report/targets',
             new lang_string('settings:targets', 'tool_time_report'),
             new lang_string('settings:targets', 'tool_time_report'),
-            [],
+            $defaulttargets,
             $targets)
         );
     }
