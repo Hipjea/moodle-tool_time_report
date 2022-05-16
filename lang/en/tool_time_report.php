@@ -40,8 +40,8 @@ $string['messageprovider:report_created'] = 'A time report has been created';
 $string['client:reportgenerating'] = 'Report generating...';
 $string['client:reportdownload'] = 'Download the report';
 $string['error:completiondates'] = 'Enter the start and end dates.';
-$string['settings:targets'] = 'Report targets';
-
+$string['settings:targets'] = 'Accounted log components';
+$string['settings:targets_desc'] = 'The target components of the log that must be accounted for in the report.';
 $string['datepicker:january'] = 'January';
 $string['datepicker:february'] = 'February';
 $string['datepicker:march'] = 'March';
