@@ -114,6 +114,9 @@ class generate_time_report extends \core\task\adhoc_task {
                         $timefortheday = $tmpdaytime;
                     }
                 }
+            } else if ($nextval->logtimecreated != $currentday->logtimecreated) {
+                // Last iteration of the day
+                $timefortheday = $timefortheday + $borrowedtime;
             }
 
             if (($timefortheday > 0 && isset($nextval) && $nextval->logtimecreated != $currentday->logtimecreated) 
