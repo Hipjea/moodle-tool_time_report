@@ -9,8 +9,6 @@ use moodle_url;
 
 class generate_time_report extends \core\task\adhoc_task {
 
-    const BORROWED_TIME = 900;
-
     public $totaltime = 0;
 
     public function setTotaltime($totaltime) { 
@@ -74,6 +72,8 @@ class generate_time_report extends \core\task\adhoc_task {
             return '<h5>'. get_string('no_results_found', 'tool_time_report') .'</h5>';
         }
 
+        $idletime = get_config('tool_time_report', 'idletime') / MINSECS;
+        $borrowedtime = get_config('tool_time_report', 'borrowedtime') * 1;
         $currentday = array_values($data)[0];
         $timefortheday = 0;
         $i = 0;
@@ -104,11 +104,11 @@ class generate_time_report extends \core\task\adhoc_task {
                 $itemtimecreated = intval($item->timecreated);
                 $timedelta = $nextvaltimecreated - $itemtimecreated;
 
-                if (intval($timedelta / 60) > 30) {
-                    $timefortheday = $timefortheday + self::BORROWED_TIME;
+                if (intval($timedelta / MINSECS) > $idletime) {
+                    $timefortheday = $timefortheday + $borrowedtime;
                 } else {
                     $tmpdaytime = $timefortheday + $nextvaltimecreated - $itemtimecreated;
-                    if ($tmpdaytime < intval($timefortheday + 30)) {
+                    if ($tmpdaytime < intval($timefortheday + $idletime)) {
                         continue;
                     } else {
                         $timefortheday = $tmpdaytime;

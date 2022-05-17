@@ -47,7 +47,7 @@ if ($hassiteconfig) {
             'tool_time_report/idletime',
             new lang_string('settings:idletime', 'tool_time_report'),
             new lang_string('settings:idletime_desc', 'tool_time_report'),
-            900)
+            30 * MINSECS)
         );
 
         // Borrowed time when idle.
@@ -55,7 +55,7 @@ if ($hassiteconfig) {
             'tool_time_report/borrowedtime',
             new lang_string('settings:borrowedtime', 'tool_time_report'),
             new lang_string('settings:borrowedtime_desc', 'tool_time_report'),
-            900)
+            15 * MINSECS)
         );
     }
 
