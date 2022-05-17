@@ -27,4 +27,5 @@ defined('MOODLE_INTERNAL') || die();
 $plugin->version = 2022051701;
 $plugin->requires = 2018050800;
 $plugin->component = 'tool_time_report';
-$plugin->maturity  = MATURITY_ALPHA;
+$plugin->release = '1.0.0';
+$plugin->maturity  = MATURITY_STABLE;
