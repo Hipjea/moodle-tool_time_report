@@ -58,7 +58,7 @@ echo $OUTPUT->header();
 $admins = get_admins();
 $is_admin = in_array($user->id, array_keys($admins));
 if ($is_admin) {
-    //redirect("$CFG->wwwroot/user/profile.php?id=$user->id");
+    redirect("$CFG->wwwroot/user/profile.php?id=$user->id");
 }
 
 // Rendering.
