@@ -44,10 +44,16 @@ function tool_time_report_myprofile_navigation(core_user\output\myprofile\tree $
 
     $userid = required_param('id', PARAM_INT);
     $courseid = optional_param('courseid', 0, PARAM_INT); // User id.
-
-    $categoryname = get_string('time_report', 'tool_time_report');
-    $category = new core_user\output\myprofile\category('time_report', $categoryname, 'contact', 'admin_category');
-    $tree->add_category($category);
+    
+    if (!array_key_exists('reports', $tree->__get('categories'))) {
+        // Create a new category.
+        $categoryname = get_string('time_report', 'tool_time_report');
+        $category = new core_user\output\myprofile\category('time_report', $categoryname, 'time_report');
+        $tree->add_category($category);
+    } else {
+        // Get the existing category.
+        $category = $tree->__get('categories')['reports'];
+    }
 
     if ($courseid != 0) {
         $context = context_course::instance($courseid);
@@ -64,9 +70,9 @@ function tool_time_report_myprofile_navigation(core_user\output\myprofile\tree $
     $admins = get_admins();
     $isadmin = in_array($USER->id, array_keys($admins));
 
-    // Controle de droit ensiegnant => user / etudiant global user.
+    // Add the node if the user is admin.
     if ($isadmin) {
-        $node = new core_user\output\myprofile\node('time_report', 'tool_time_report', get_string('time_report', 'tool_time_report'), null, $url);
+        $node = new core_user\output\myprofile\node('reports', 'tool_time_report', get_string('time_report', 'tool_time_report'), null, $url);
         $category->add_node($node);
     }
 
