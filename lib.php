@@ -41,7 +41,6 @@ use core_user\output\myprofile\tree;
  */
 function tool_time_report_myprofile_navigation(core_user\output\myprofile\tree $tree, $user, $iscurrentuser, $course) {
     global $CFG, $USER;
-    $isteacher = false;
 
     $userid = required_param('id', PARAM_INT);
     $courseid = optional_param('courseid', 0, PARAM_INT); // User id.
@@ -56,27 +55,20 @@ function tool_time_report_myprofile_navigation(core_user\output\myprofile\tree $
         $context = context_system::instance();
     }
 
-    if (has_any_capability(array('moodle/site:config', 'moodle/course:manageactivities'), $context)) {
-        $isteacher = true;
-    }
-
-    // Controle de droit ensiegnant => user / etudiant global user.
-    if ($isteacher) {
-        $usercontext = \context_user::instance($userid);
-        $uid = $userid;
-    } else {
-        $usercontext = \context_user::instance($USER->id);
-        $uid = $USER->id;
-    }
-
     if (isset($course->id)) {
         $url = new moodle_url('/admin/tool/time_report/view.php', ['userid' => $user->id, 'course' => $course->id]);
     } else {
         $url = new moodle_url('/admin/tool/time_report/view.php', ['userid' => $user->id]);
     }
 
-    $node = new core_user\output\myprofile\node('time_report', 'tool_time_report', get_string('time_report', 'tool_time_report'), null, $url);
-    $category->add_node($node);
+    $admins = get_admins();
+    $isadmin = in_array($USER->id, array_keys($admins));
+
+    // Controle de droit ensiegnant => user / etudiant global user.
+    if ($isadmin) {
+        $node = new core_user\output\myprofile\node('time_report', 'tool_time_report', get_string('time_report', 'tool_time_report'), null, $url);
+        $category->add_node($node);
+    }
 
     return true;
 }
