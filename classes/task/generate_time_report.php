@@ -9,8 +9,6 @@ use moodle_url;
 
 class generate_time_report extends \core\task\adhoc_task {
 
-    const BORROWED_TIME = 900;
-
     public $totaltime = 0;
 
     public function setTotaltime($totaltime) { 
@@ -74,6 +72,8 @@ class generate_time_report extends \core\task\adhoc_task {
             return '<h5>'. get_string('no_results_found', 'tool_time_report') .'</h5>';
         }
 
+        $idletime = get_config('tool_time_report', 'idletime') / MINSECS;
+        $borrowedtime = get_config('tool_time_report', 'borrowedtime') * 1;
         $currentday = array_values($data)[0];
         $timefortheday = 0;
         $i = 0;
@@ -85,37 +85,37 @@ class generate_time_report extends \core\task\adhoc_task {
         for ($i; $i < $length; $i++) {
             $item = array_values($data)[$i];
             $nextval = self::get_nextval($data, $i);
-        
+
             // Last iteration
             if ($item->id == $nextval->id) {
                 $totaltime = $totaltime + $timefortheday;
                 $out = self::push_result($out, $item->timecreated, $timefortheday);
                 break;
             }
-        
+
             // If the item log time is different than the current day time, we move forward
             if ($item->logtimecreated != $currentday->logtimecreated) {
                 $currentday = $item;
                 $timefortheday = 0;
             }
-        
+
             if (isset($nextval) && $nextval->logtimecreated == $currentday->logtimecreated) {
                 $nextvaltimecreated = intval($nextval->timecreated);
                 $itemtimecreated = intval($item->timecreated);
                 $timedelta = $nextvaltimecreated - $itemtimecreated;
-        
-                if (intval($timedelta / 60) > 30) {
-                    $timefortheday = $timefortheday + self::BORROWED_TIME;
+
+                if (intval($timedelta / MINSECS) > $idletime) {
+                    $timefortheday = $timefortheday + $borrowedtime;
                 } else {
                     $tmpdaytime = $timefortheday + $nextvaltimecreated - $itemtimecreated;
-                    if ($tmpdaytime < intval($timefortheday + 30)) {
+                    if ($tmpdaytime < intval($timefortheday + $idletime)) {
                         continue;
                     } else {
                         $timefortheday = $tmpdaytime;
                     }
                 }
             }
-        
+
             if (($timefortheday > 0 && isset($nextval) && $nextval->logtimecreated != $currentday->logtimecreated) 
                 || ($timefortheday > 0 && $nextval == $item)) {
                 $totaltime = $totaltime + $timefortheday;

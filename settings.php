@@ -30,14 +30,32 @@ if ($hassiteconfig) {
     $settingspage = new admin_settingpage('manage_tool_time_report', new lang_string('pluginname', 'tool_time_report'));
 
     if ($ADMIN->fulltree) {
+        // Components targets.
         $targets = get_targets();
+        $defaulttargets = array_keys($targets);
 
         $settingspage->add(new admin_setting_configmultiselect(
             'tool_time_report/targets',
             new lang_string('settings:targets', 'tool_time_report'),
             new lang_string('settings:targets', 'tool_time_report'),
-            [],
+            $defaulttargets,
             $targets)
+        );
+
+        // Idle time.
+        $settingspage->add(new admin_setting_configduration(
+            'tool_time_report/idletime',
+            new lang_string('settings:idletime', 'tool_time_report'),
+            new lang_string('settings:idletime_desc', 'tool_time_report'),
+            30 * MINSECS)
+        );
+
+        // Borrowed time when idle.
+        $settingspage->add(new admin_setting_configduration(
+            'tool_time_report/borrowedtime',
+            new lang_string('settings:borrowedtime', 'tool_time_report'),
+            new lang_string('settings:borrowedtime_desc', 'tool_time_report'),
+            15 * MINSECS)
         );
     }
 
