@@ -22,8 +22,8 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['pluginname'] = 'Rapports de temps';
-$string['time_report'] = 'Rapports de temps';
+$string['pluginname'] = 'Rapports de temps connexion';
+$string['time_report'] = 'Rapports de temps connexion';
 $string['messageprovider:reportcreation'] = 'Création du rapport';
 $string['time_report:view'] = 'Voir les rapports de temps';
 $string['time_report'] = 'Rapport de temps de connexion';
