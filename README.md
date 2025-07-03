@@ -1,5 +1,8 @@
 # moodle-tool_time_report
 
+> [!IMPORTANT]
+> This plugin is now hosted at https://github.com/fondation-unit/moodle-tool_time_report
+
 Admin tool for [Moodle](https://moodle.org/) creating reports of time spent online.
 
 * [Installation](#installation)
